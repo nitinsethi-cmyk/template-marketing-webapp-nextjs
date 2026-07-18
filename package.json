@@ -99,7 +99,8 @@
     "postcss": "8.5.10",
     "prettier": "3.8.1",
     "react-i18next": "16.5.3",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "wrangler": "^4.112.0"
   },
   "resolutions": {
     "**/trim": "1.0.1",
