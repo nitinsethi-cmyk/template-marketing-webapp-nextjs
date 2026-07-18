@@ -187,6 +187,10 @@ bower_components
 
 .env
 
+### Cloudflare OpenNext ###
+.open-next
+.dev.vars
+
 ### Intellij ###
 .idea/
 
