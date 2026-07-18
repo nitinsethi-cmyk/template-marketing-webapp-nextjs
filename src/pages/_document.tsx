@@ -28,6 +28,20 @@ export default class CustomDocument extends Document {
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
           <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
           <link rel="manifest" href="/site.webmanifest" />
+
+          <script src="https://cdn.amplitude.com/script/13763c810e8e420a211a47efe6d52a1a.js" />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.amplitude.init("13763c810e8e420a211a47efe6d52a1a", {
+                  defaultTracking: true,
+                  autocapture: true,
+                  fetchRemoteConfig: true,
+                });
+                window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
+              `,
+            }}
+          />
         </Head>
         <body>
           <Main />

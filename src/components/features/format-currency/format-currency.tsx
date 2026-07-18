@@ -3,7 +3,7 @@ import { useContentfulContext } from '@src/contentful-context';
 interface FormatCurrencyProps {
   value: number;
   locale?: string;
-  style?: string;
+  style?: Intl.NumberFormatOptions['style'];
   currency?: string;
 }
 

@@ -62,7 +62,10 @@ module.exports = withPlugins(plugins, {
    */
   images: {
     deviceSizes: [320, 420, 768, 1024, 1200, 1600],
-    domains: ['images.ctfassets.net','images.eu.ctfassets.net'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'images.ctfassets.net' },
+      { protocol: 'https', hostname: 'images.eu.ctfassets.net' },
+    ],
     path: '/_next/image',
     loader: 'default',
   },

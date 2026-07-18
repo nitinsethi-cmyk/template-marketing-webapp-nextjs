@@ -111,7 +111,8 @@ export const Link = (props: Props) => {
         size={size}
         startIcon={startIcon}
         endIcon={endIcon}
-        title={title}>
+        title={title}
+      >
         {children}
       </MuiButton>
     ) : (
@@ -123,7 +124,8 @@ export const Link = (props: Props) => {
         target={props.target}
         rel="noopener noreferrer"
         onClick={() => onClick && onClick()}
-        title={title}>
+        title={title}
+      >
         {children}
       </MuiLink>
     );
@@ -131,17 +133,15 @@ export const Link = (props: Props) => {
 
   if (withoutMaterial === true) {
     return (
-      <NextLink href={href} as={as} passHref>
-        <a className={clsx(classes.baseAnchor, className)} title={title}>
-          {children}
-        </a>
+      <NextLink href={href} as={as} className={clsx(classes.baseAnchor, className)} title={title}>
+        {children}
       </NextLink>
     );
   }
 
   if (isButton === true) {
     return (
-      <NextLink href={href} as={as} passHref>
+      <NextLink href={href} as={as} passHref legacyBehavior>
         <MuiButton
           href={as}
           className={className}
@@ -151,7 +151,8 @@ export const Link = (props: Props) => {
           size={size}
           startIcon={startIcon}
           endIcon={endIcon}
-          title={title}>
+          title={title}
+        >
           {children}
         </MuiButton>
       </NextLink>
@@ -159,14 +160,15 @@ export const Link = (props: Props) => {
   }
 
   return (
-    <NextLink href={href} as={as} passHref>
+    <NextLink href={href} as={as} passHref legacyBehavior>
       <MuiLink
         href={as}
         className={className}
         underline={underlineStyle}
         color={color}
         onClick={() => onClick && onClick()}
-        title={title}>
+        title={title}
+      >
         {children}
       </MuiLink>
     </NextLink>

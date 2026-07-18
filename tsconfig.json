@@ -3,9 +3,9 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmit": true,
     "preserveConstEnums": true,
     "removeComments": false,
@@ -16,18 +16,39 @@
     "target": "esnext",
     "baseUrl": "./",
     "paths": {
-      "@public/*": ["./public/*"],
-      "@pages/*": ["./pages/*"],
-      "@src/*": ["./src/*"],
-      "@ctf-components/*": ["./src/ctf-components/*"]
+      "@public/*": [
+        "./public/*"
+      ],
+      "@pages/*": [
+        "./pages/*"
+      ],
+      "@src/*": [
+        "./src/*"
+      ],
+      "@ctf-components/*": [
+        "./src/ctf-components/*"
+      ]
     },
-    "typeRoots": ["./@types", "./node_modules/@types"],
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "typeRoots": [
+      "./@types",
+      "./node_modules/@types"
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "isolatedModules": true,
     "incremental": true
   },
-  "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx", "@types/**/*.d.ts"]
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "@types/**/*.d.ts"
+  ]
 }
