@@ -18,6 +18,18 @@ const { withPlugins } = nextComposePlugins.extend(() => ({}));
 module.exports = withPlugins(plugins, {
   i18n,
   /**
+   * Keep Emotion/MUI external so OpenNext can copy workerd/edge-light entrypoints
+   * instead of esbuild resolving a missing edge-light file during the Workers bundle.
+   * See: https://opennext.js.org/cloudflare/howtos/workerd
+   */
+  serverExternalPackages: [
+    '@emotion/cache',
+    '@emotion/react',
+    '@emotion/serialize',
+    '@emotion/styled',
+    '@emotion/utils',
+  ],
+  /**
    * add the environment variables you would like exposed to the client here
    * documentation: https://nextjs.org/docs/api-reference/next.config.js/environment-variables
    */
