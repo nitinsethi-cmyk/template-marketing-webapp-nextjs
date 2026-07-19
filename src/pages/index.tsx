@@ -55,7 +55,8 @@ export const getServerSideProps = async ({ locale, query }: NextPageContext) => 
         dehydratedState: dehydrate(queryClient),
       },
     };
-  } catch {
+  } catch (error) {
+    console.error('getServerSideProps failed for /', error);
     return {
       notFound: true,
     };

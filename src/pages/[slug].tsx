@@ -115,7 +115,8 @@ export const getServerSideProps = async ({ locale, params, query }: CustomNextPa
         dehydratedState: dehydrate(queryClient),
       },
     };
-  } catch {
+  } catch (error) {
+    console.error(`getServerSideProps failed for /${slug}`, error);
     return {
       notFound: true,
     };
