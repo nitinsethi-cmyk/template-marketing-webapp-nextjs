@@ -25,7 +25,7 @@ interface LayoutPropsInterface {
 
 export const Layout: React.FC<LayoutPropsInterface> = ({ children }) => {
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const classes = useStyles();
+  const classes = useStyles({} as never);
   const router = useRouter();
 
   useEffect(() => {

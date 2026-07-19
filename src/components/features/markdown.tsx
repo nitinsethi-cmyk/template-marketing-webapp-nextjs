@@ -43,7 +43,7 @@ type Props = {
 };
 
 export const Markdown = (props: Props) => {
-  const classes = useStyles();
+  const classes = useStyles({} as never);
   return (
     <div className={clsx(classes.root, props.className)}>
       {(renderer.processSync(props.text) as any).result}
