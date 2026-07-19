@@ -1,18 +1,41 @@
+function getFetchConfig() {
+  const spaceId = process.env.CONTENTFUL_SPACE_ID;
+  const accessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
+  const previewToken = process.env.CONTENTFUL_PREVIEW_ACCESS_TOKEN;
+
+  if (!spaceId || !accessToken) {
+    throw new Error(
+      'Missing CONTENTFUL_SPACE_ID or CONTENTFUL_ACCESS_TOKEN. Set them as Worker runtime variables in the Cloudflare dashboard (Settings → Variables), not only as Build variables.',
+    );
+  }
+
+  return {
+    endpoint: `https://graphql.contentful.com/content/v1/spaces/${spaceId}`,
+    params: {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+    previewParams: {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${previewToken || ''}`,
+      },
+    },
+  };
+}
+
+/** @deprecated Prefer getFetchConfig() so env is read inside the request context on Workers. */
 export const fetchConfig = {
-  endpoint: `https://graphql.contentful.com/content/v1/spaces/${String(
-    process.env.CONTENTFUL_SPACE_ID,
-  )}`,
-  params: {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
-    },
+  get endpoint() {
+    return getFetchConfig().endpoint;
   },
-  previewParams: {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.CONTENTFUL_PREVIEW_ACCESS_TOKEN}`,
-    },
+  get params() {
+    return getFetchConfig().params;
+  },
+  get previewParams() {
+    return getFetchConfig().previewParams;
   },
 };
 
@@ -22,10 +45,11 @@ export function customFetcher<TData, TVariables extends { preview?: boolean | nu
   options?: RequestInit['headers'],
 ) {
   return async (): Promise<TData> => {
-    const res = await fetch(fetchConfig.endpoint as string, {
+    const config = getFetchConfig();
+    const res = await fetch(config.endpoint, {
       method: 'POST',
       ...options,
-      ...(variables?.preview ? fetchConfig.previewParams : fetchConfig.params),
+      ...(variables?.preview ? config.previewParams : config.params),
       body: JSON.stringify({ query, variables }),
     });
 

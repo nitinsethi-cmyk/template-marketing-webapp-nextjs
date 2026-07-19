@@ -13,7 +13,7 @@
     "build": "next build --webpack",
     "export": "next build --webpack && next export",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --keep-vars",
     "prepare": "husky install",
     "type-check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
