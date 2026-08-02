@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { Settings } from '@src/components/features/settings';
 import { Layout } from '@src/components/templates/layout/layout';
 import { useContentfulContext, ContentfulContentProvider } from '@src/contentful-context';
+import { ExperimentProvider } from '@src/lib/experiment';
 import { queryConfig } from '@src/lib/gql-client';
 import colorfulTheme from '@src/theme';
 import contentfulConfig from 'contentful.config';
@@ -84,10 +85,12 @@ const CustomApp = ({
             <StyledEngineProvider injectFirst>
               <ThemeProvider theme={colorfulTheme}>
                 <Hydrate state={dehydratedState}>
-                  <Layout preview={previewActive}>
-                    <Component {...pageProps} err={err} />
-                    <Settings />
-                  </Layout>
+                  <ExperimentProvider>
+                    <Layout preview={previewActive}>
+                      <Component {...pageProps} err={err} />
+                      <Settings />
+                    </Layout>
+                  </ExperimentProvider>
                 </Hydrate>
               </ThemeProvider>
             </StyledEngineProvider>
