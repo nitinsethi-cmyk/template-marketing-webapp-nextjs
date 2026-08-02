@@ -10,9 +10,9 @@ export type RichTextHyperlinkFieldsFragment = { __typename?: 'Query', page?: (
   ) | null };
 
 export type CtfRichTextHyperlinkQueryVariables = Types.Exact<{
-  id: Types.Scalars['String'];
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  id: Types.Scalars['String']['input'];
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -20,6 +20,7 @@ export type CtfRichTextHyperlinkQuery = (
   { __typename?: 'Query' }
   & RichTextHyperlinkFieldsFragment
 );
+
 
 export const RichTextHyperlinkFieldsFragmentDoc = `
     fragment RichTextHyperlinkFields on Query {
@@ -34,20 +35,22 @@ export const CtfRichTextHyperlinkDocument = `
 }
     ${RichTextHyperlinkFieldsFragmentDoc}
 ${PageLinkFieldsFragmentDoc}`;
+
 export const useCtfRichTextHyperlinkQuery = <
       TData = CtfRichTextHyperlinkQuery,
       TError = unknown
     >(
       variables: CtfRichTextHyperlinkQueryVariables,
       options?: UseQueryOptions<CtfRichTextHyperlinkQuery, TError, TData>
-    ) =>
-    useQuery<CtfRichTextHyperlinkQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfRichTextHyperlinkQuery, TError, TData>(
       ['CtfRichTextHyperlink', variables],
       customFetcher<CtfRichTextHyperlinkQuery, CtfRichTextHyperlinkQueryVariables>(CtfRichTextHyperlinkDocument, variables),
       options
-    );
+    )};
 
 useCtfRichTextHyperlinkQuery.getKey = (variables: CtfRichTextHyperlinkQueryVariables) => ['CtfRichTextHyperlink', variables];
-;
+
 
 useCtfRichTextHyperlinkQuery.fetcher = (variables: CtfRichTextHyperlinkQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfRichTextHyperlinkQuery, CtfRichTextHyperlinkQueryVariables>(CtfRichTextHyperlinkDocument, variables, options);

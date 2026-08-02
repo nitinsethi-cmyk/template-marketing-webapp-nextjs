@@ -14,9 +14,9 @@ export type ProductTableFieldsFragment = { __typename: 'ComponentProductTable', 
     ) | null> } | null };
 
 export type CtfProductTableQueryVariables = Types.Exact<{
-  id: Types.Scalars['String'];
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  id: Types.Scalars['String']['input'];
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -24,6 +24,7 @@ export type CtfProductTableQuery = { __typename?: 'Query', componentProductTable
     { __typename?: 'ComponentProductTable' }
     & ProductTableFieldsFragment
   ) | null };
+
 
 export const ProductTableFieldsFragmentDoc = `
     fragment ProductTableFields on ComponentProductTable {
@@ -50,20 +51,22 @@ export const CtfProductTableDocument = `
 ${ProductFieldsFragmentDoc}
 ${AssetFieldsFragmentDoc}
 ${ProductFeatureFieldsFragmentDoc}`;
+
 export const useCtfProductTableQuery = <
       TData = CtfProductTableQuery,
       TError = unknown
     >(
       variables: CtfProductTableQueryVariables,
       options?: UseQueryOptions<CtfProductTableQuery, TError, TData>
-    ) =>
-    useQuery<CtfProductTableQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfProductTableQuery, TError, TData>(
       ['CtfProductTable', variables],
       customFetcher<CtfProductTableQuery, CtfProductTableQueryVariables>(CtfProductTableDocument, variables),
       options
-    );
+    )};
 
 useCtfProductTableQuery.getKey = (variables: CtfProductTableQueryVariables) => ['CtfProductTable', variables];
-;
+
 
 useCtfProductTableQuery.fetcher = (variables: CtfProductTableQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfProductTableQuery, CtfProductTableQueryVariables>(CtfProductTableDocument, variables, options);

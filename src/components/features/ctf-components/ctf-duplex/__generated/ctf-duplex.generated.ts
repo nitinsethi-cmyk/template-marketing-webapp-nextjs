@@ -15,9 +15,9 @@ export type DuplexFieldsFragment = { __typename: 'ComponentDuplex', containerLay
   ) | null };
 
 export type CtfDuplexQueryVariables = Types.Exact<{
-  id: Types.Scalars['String'];
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  id: Types.Scalars['String']['input'];
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -25,6 +25,7 @@ export type CtfDuplexQuery = { __typename?: 'Query', componentDuplex?: (
     { __typename?: 'ComponentDuplex' }
     & DuplexFieldsFragment
   ) | null };
+
 
 export const DuplexFieldsFragmentDoc = `
     fragment DuplexFields on ComponentDuplex {
@@ -57,20 +58,22 @@ export const CtfDuplexDocument = `
     ${DuplexFieldsFragmentDoc}
 ${PageLinkFieldsFragmentDoc}
 ${AssetFieldsFragmentDoc}`;
+
 export const useCtfDuplexQuery = <
       TData = CtfDuplexQuery,
       TError = unknown
     >(
       variables: CtfDuplexQueryVariables,
       options?: UseQueryOptions<CtfDuplexQuery, TError, TData>
-    ) =>
-    useQuery<CtfDuplexQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfDuplexQuery, TError, TData>(
       ['CtfDuplex', variables],
       customFetcher<CtfDuplexQuery, CtfDuplexQueryVariables>(CtfDuplexDocument, variables),
       options
-    );
+    )};
 
 useCtfDuplexQuery.getKey = (variables: CtfDuplexQueryVariables) => ['CtfDuplex', variables];
-;
+
 
 useCtfDuplexQuery.fetcher = (variables: CtfDuplexQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfDuplexQuery, CtfDuplexQueryVariables>(CtfDuplexDocument, variables, options);

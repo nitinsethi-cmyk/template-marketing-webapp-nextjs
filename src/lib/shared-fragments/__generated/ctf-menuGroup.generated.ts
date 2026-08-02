@@ -7,6 +7,7 @@ export type MenuGroupFieldsFragment = { __typename?: 'MenuGroupFeaturedPagesColl
     & PageLinkFieldsFragment
   ) | null> };
 
+
 export const MenuGroupFieldsFragmentDoc = `
     fragment MenuGroupFields on MenuGroupFeaturedPagesCollection {
   items {

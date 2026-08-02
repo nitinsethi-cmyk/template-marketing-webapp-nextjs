@@ -10,9 +10,9 @@ export type PersonFieldsFragment = { __typename: 'TopicPerson', name?: string | 
   ) | null };
 
 export type CtfPersonQueryVariables = Types.Exact<{
-  id: Types.Scalars['String'];
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  id: Types.Scalars['String']['input'];
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -20,6 +20,7 @@ export type CtfPersonQuery = { __typename?: 'Query', topicPerson?: (
     { __typename?: 'TopicPerson' }
     & PersonFieldsFragment
   ) | null };
+
 
 export const PersonFieldsFragmentDoc = `
     fragment PersonFields on TopicPerson {
@@ -47,20 +48,22 @@ export const CtfPersonDocument = `
 }
     ${PersonFieldsFragmentDoc}
 ${AssetFieldsFragmentDoc}`;
+
 export const useCtfPersonQuery = <
       TData = CtfPersonQuery,
       TError = unknown
     >(
       variables: CtfPersonQueryVariables,
       options?: UseQueryOptions<CtfPersonQuery, TError, TData>
-    ) =>
-    useQuery<CtfPersonQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfPersonQuery, TError, TData>(
       ['CtfPerson', variables],
       customFetcher<CtfPersonQuery, CtfPersonQueryVariables>(CtfPersonDocument, variables),
       options
-    );
+    )};
 
 useCtfPersonQuery.getKey = (variables: CtfPersonQueryVariables) => ['CtfPerson', variables];
-;
+
 
 useCtfPersonQuery.fetcher = (variables: CtfPersonQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfPersonQuery, CtfPersonQueryVariables>(CtfPersonDocument, variables, options);

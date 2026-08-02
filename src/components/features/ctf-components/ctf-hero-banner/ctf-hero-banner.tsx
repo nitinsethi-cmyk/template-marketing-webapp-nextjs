@@ -9,7 +9,6 @@ import { HeroBannerFieldsFragment } from './__generated/ctf-hero-banner.generate
 import { CtfRichtext } from '@src/components/features/ctf-components/ctf-richtext/ctf-richtext';
 import { PageLink } from '@src/components/features/page-link';
 import LayoutContext, { defaultLayout, useLayoutContext } from '@src/layout-context';
-import { useVariant } from '@src/lib/experiment';
 import { getColorConfigFromPalette, HEADER_HEIGHT_MD, HEADER_HEIGHT } from '@src/theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -124,8 +123,6 @@ export const CtfHeroBanner = (props: HeroBannerFieldsFragment) => {
   );
   const classes = useStyles();
   const inspectorMode = useContentfulInspectorMode({ entryId: id });
-  const hpCta = useVariant('hp-cta', 'control');
-  const displayCtaText = hpCta.value === 'treatment' ? 'Start free today' : ctaText;
 
   return (
     <Container
@@ -176,7 +173,7 @@ export const CtfHeroBanner = (props: HeroBannerFieldsFragment) => {
             </div>
           </LayoutContext.Provider>
         )}
-        {targetPage && displayCtaText && (
+        {targetPage && ctaText && (
           <div className={classes.ctaContainer}>
             <PageLink
               page={targetPage}
@@ -184,7 +181,7 @@ export const CtfHeroBanner = (props: HeroBannerFieldsFragment) => {
               color={colorConfig.buttonColor}
               isButton
             >
-              {displayCtaText}
+              {ctaText}
             </PageLink>
           </div>
         )}

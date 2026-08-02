@@ -15,8 +15,8 @@ export type FooterFieldsFragment = { __typename?: 'FooterMenuCollection', items:
       ) | null } | null } | null> };
 
 export type CtfFooterQueryVariables = Types.Exact<{
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -24,6 +24,7 @@ export type CtfFooterQuery = { __typename?: 'Query', footerMenuCollection?: (
     { __typename?: 'FooterMenuCollection' }
     & FooterFieldsFragment
   ) | null };
+
 
 export const FooterFieldsFragmentDoc = `
     fragment FooterFields on FooterMenuCollection {
@@ -65,20 +66,22 @@ export const CtfFooterDocument = `
     ${FooterFieldsFragmentDoc}
 ${MenuGroupFieldsFragmentDoc}
 ${PageLinkFieldsFragmentDoc}`;
+
 export const useCtfFooterQuery = <
       TData = CtfFooterQuery,
       TError = unknown
     >(
       variables?: CtfFooterQueryVariables,
       options?: UseQueryOptions<CtfFooterQuery, TError, TData>
-    ) =>
-    useQuery<CtfFooterQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfFooterQuery, TError, TData>(
       variables === undefined ? ['CtfFooter'] : ['CtfFooter', variables],
       customFetcher<CtfFooterQuery, CtfFooterQueryVariables>(CtfFooterDocument, variables),
       options
-    );
+    )};
 
 useCtfFooterQuery.getKey = (variables?: CtfFooterQueryVariables) => variables === undefined ? ['CtfFooter'] : ['CtfFooter', variables];
-;
+
 
 useCtfFooterQuery.fetcher = (variables?: CtfFooterQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfFooterQuery, CtfFooterQueryVariables>(CtfFooterDocument, variables, options);

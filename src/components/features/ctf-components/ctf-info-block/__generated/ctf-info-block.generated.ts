@@ -16,9 +16,9 @@ export type InfoBlockFieldsFragment = { __typename: 'ComponentInfoBlock', headli
   ) | null, block3Body?: { __typename?: 'ComponentInfoBlockBlock3Body', json: any } | null };
 
 export type CtfInfoBlockQueryVariables = Types.Exact<{
-  id: Types.Scalars['String'];
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  id: Types.Scalars['String']['input'];
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -26,6 +26,7 @@ export type CtfInfoBlockQuery = { __typename?: 'Query', componentInfoBlock?: (
     { __typename?: 'ComponentInfoBlock' }
     & InfoBlockFieldsFragment
   ) | null };
+
 
 export const InfoBlockFieldsFragmentDoc = `
     fragment InfoBlockFields on ComponentInfoBlock {
@@ -64,20 +65,22 @@ export const CtfInfoBlockDocument = `
 }
     ${InfoBlockFieldsFragmentDoc}
 ${AssetFieldsFragmentDoc}`;
+
 export const useCtfInfoBlockQuery = <
       TData = CtfInfoBlockQuery,
       TError = unknown
     >(
       variables: CtfInfoBlockQueryVariables,
       options?: UseQueryOptions<CtfInfoBlockQuery, TError, TData>
-    ) =>
-    useQuery<CtfInfoBlockQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfInfoBlockQuery, TError, TData>(
       ['CtfInfoBlock', variables],
       customFetcher<CtfInfoBlockQuery, CtfInfoBlockQueryVariables>(CtfInfoBlockDocument, variables),
       options
-    );
+    )};
 
 useCtfInfoBlockQuery.getKey = (variables: CtfInfoBlockQueryVariables) => ['CtfInfoBlock', variables];
-;
+
 
 useCtfInfoBlockQuery.fetcher = (variables: CtfInfoBlockQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfInfoBlockQuery, CtfInfoBlockQueryVariables>(CtfInfoBlockDocument, variables, options);

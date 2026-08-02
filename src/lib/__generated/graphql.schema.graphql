@@ -1,16 +1,33 @@
+directive @contentSourceMaps on QUERY
+
+directive @contentfulSchemaMetadata(contentTypePublishedCounters: JSON) on SCHEMA
+
+directive @delegatedResourceLink(contentTypeId: String, field: JSON) on FIELD_DEFINITION | OBJECT
+
+directive @enumMapper(value: JSON) on ENUM_VALUE
+
+directive @featureFlag(featureName: String) on FIELD
+
+directive @fieldResolver(data: JSON, kind: String) on FIELD_DEFINITION
+
+directive @timeline(where: TimelineFilterInput!) on QUERY
+
+directive @typeIdentifier(contentTypeId: String) on OBJECT
+
 """Represents a binary file in a space. An asset can be any file type."""
-type Asset {
-  contentType(locale: String): String
+type Asset implements _Node {
+  _id: ID!
+  contentType(locale: String, useFallbackLocale: Boolean): String
   contentfulMetadata: ContentfulMetadata!
-  description(locale: String): String
-  fileName(locale: String): String
-  height(locale: String): Int
+  description(locale: String, useFallbackLocale: Boolean): String
+  fileName(locale: String, useFallbackLocale: Boolean): String
+  height(locale: String, useFallbackLocale: Boolean): Int
   linkedFrom(allowedLocales: [String]): AssetLinkingCollections
-  size(locale: String): Int
+  size(locale: String, useFallbackLocale: Boolean): Int
   sys: Sys!
-  title(locale: String): String
-  url(locale: String, transform: ImageTransformOptions): String
-  width(locale: String): Int
+  title(locale: String, useFallbackLocale: Boolean): String
+  url(locale: String, transform: ImageTransformOptions, useFallbackLocale: Boolean): String
+  width(locale: String, useFallbackLocale: Boolean): Int
 }
 
 type AssetCollection {
@@ -18,6 +35,12 @@ type AssetCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type AssetCursorCollection {
+  items: [Asset]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input AssetFilter {
@@ -90,15 +113,24 @@ input AssetFilter {
 }
 
 type AssetLinkingCollections {
-  componentDuplexCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): ComponentDuplexCollection
-  componentHeroBannerCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): ComponentHeroBannerCollection
-  componentInfoBlockCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): ComponentInfoBlockCollection
-  componentQuoteCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): ComponentQuoteCollection
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  seoCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): SeoCollection
-  topicBusinessInfoCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): TopicBusinessInfoCollection
-  topicPersonCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): TopicPersonCollection
-  topicProductCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): TopicProductCollection
+  componentDuplexCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentDuplexCollection
+  componentDuplexCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentDuplexCursorCollection
+  componentHeroBannerCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentHeroBannerCollection
+  componentHeroBannerCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentHeroBannerCursorCollection
+  componentInfoBlockCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentInfoBlockCollection
+  componentInfoBlockCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentInfoBlockCursorCollection
+  componentQuoteCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentQuoteCollection
+  componentQuoteCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentQuoteCursorCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  seoCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): SeoCollection
+  seoCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): SeoCursorCollection
+  topicBusinessInfoCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): TopicBusinessInfoCollection
+  topicBusinessInfoCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): TopicBusinessInfoCursorCollection
+  topicPersonCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): TopicPersonCollection
+  topicPersonCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): TopicPersonCursorCollection
+  topicProductCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): TopicProductCollection
+  topicProductCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): TopicProductCursorCollection
 }
 
 enum AssetOrder {
@@ -125,19 +157,20 @@ enum AssetOrder {
 }
 
 """
-Full-width container for creating visually distinct Calls-to-Action (CTAs) [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/componentCta)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/componentCta)
 """
-type ComponentCta implements Entry {
-  colorPalette(locale: String): String
+type ComponentCta implements Entry & _Node {
+  _id: ID!
+  colorPalette(locale: String, useFallbackLocale: Boolean): String
   contentfulMetadata: ContentfulMetadata!
-  ctaText(locale: String): String
-  headline(locale: String): String
-  internalName(locale: String): String
+  ctaText(locale: String, useFallbackLocale: Boolean): String
+  headline(locale: String, useFallbackLocale: Boolean): String
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): ComponentCtaLinkingCollections
-  subline(locale: String): ComponentCtaSubline
+  subline(locale: String, useFallbackLocale: Boolean): ComponentCtaSubline
   sys: Sys!
-  targetPage(locale: String, preview: Boolean): ComponentCtaTargetPage
-  urlParameters(locale: String): String
+  targetPage(locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentCtaTargetPage
+  urlParameters(locale: String, useFallbackLocale: Boolean): String
 }
 
 type ComponentCtaCollection {
@@ -145,6 +178,12 @@ type ComponentCtaCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type ComponentCtaCursorCollection {
+  items: [ComponentCta]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input ComponentCtaFilter {
@@ -194,8 +233,44 @@ input ComponentCtaFilter {
 }
 
 type ComponentCtaLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [ComponentCtaLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [ComponentCtaLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum ComponentCtaLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum ComponentCtaLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum ComponentCtaOrder {
@@ -238,26 +313,46 @@ type ComponentCtaSublineEntries {
 type ComponentCtaSublineLinks {
   assets: ComponentCtaSublineAssets!
   entries: ComponentCtaSublineEntries!
+  resources: ComponentCtaSublineResources!
+}
+
+type ComponentCtaSublineResources {
+  block: [ComponentCtaSublineResourcesBlock!]!
+  hyperlink: [ComponentCtaSublineResourcesHyperlink!]!
+  inline: [ComponentCtaSublineResourcesInline!]!
+}
+
+type ComponentCtaSublineResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentCtaSublineResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentCtaSublineResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 union ComponentCtaTargetPage = Page
 
 """
-Full-width container for displaying side-by-side image and copy, includes multiple layout options [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/componentDuplex)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/componentDuplex)
 """
-type ComponentDuplex implements Entry {
-  bodyText(locale: String): ComponentDuplexBodyText
-  colorPalette(locale: String): String
-  containerLayout(locale: String): Boolean
+type ComponentDuplex implements Entry & _Node {
+  _id: ID!
+  bodyText(locale: String, useFallbackLocale: Boolean): ComponentDuplexBodyText
+  colorPalette(locale: String, useFallbackLocale: Boolean): String
+  containerLayout(locale: String, useFallbackLocale: Boolean): Boolean
   contentfulMetadata: ContentfulMetadata!
-  ctaText(locale: String): String
-  headline(locale: String): String
-  image(locale: String, preview: Boolean): Asset
-  imageStyle(locale: String): Boolean
-  internalName(locale: String): String
+  ctaText(locale: String, useFallbackLocale: Boolean): String
+  headline(locale: String, useFallbackLocale: Boolean): String
+  image(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  imageStyle(locale: String, useFallbackLocale: Boolean): Boolean
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): ComponentDuplexLinkingCollections
   sys: Sys!
-  targetPage(locale: String, preview: Boolean): ComponentDuplexTargetPage
+  targetPage(locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentDuplexTargetPage
 }
 
 type ComponentDuplexBodyText {
@@ -279,6 +374,25 @@ type ComponentDuplexBodyTextEntries {
 type ComponentDuplexBodyTextLinks {
   assets: ComponentDuplexBodyTextAssets!
   entries: ComponentDuplexBodyTextEntries!
+  resources: ComponentDuplexBodyTextResources!
+}
+
+type ComponentDuplexBodyTextResources {
+  block: [ComponentDuplexBodyTextResourcesBlock!]!
+  hyperlink: [ComponentDuplexBodyTextResourcesHyperlink!]!
+  inline: [ComponentDuplexBodyTextResourcesInline!]!
+}
+
+type ComponentDuplexBodyTextResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentDuplexBodyTextResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentDuplexBodyTextResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 type ComponentDuplexCollection {
@@ -286,6 +400,12 @@ type ComponentDuplexCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type ComponentDuplexCursorCollection {
+  items: [ComponentDuplex]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input ComponentDuplexFilter {
@@ -335,8 +455,44 @@ input ComponentDuplexFilter {
 }
 
 type ComponentDuplexLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [ComponentDuplexLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [ComponentDuplexLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum ComponentDuplexLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum ComponentDuplexLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum ComponentDuplexOrder {
@@ -365,21 +521,22 @@ enum ComponentDuplexOrder {
 union ComponentDuplexTargetPage = Page
 
 """
-Full-width container for displaying images and snappy copy; can include an optional CTA [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/componentHeroBanner)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/componentHeroBanner)
 """
-type ComponentHeroBanner implements Entry {
-  bodyText(locale: String): ComponentHeroBannerBodyText
-  colorPalette(locale: String): String
+type ComponentHeroBanner implements Entry & _Node {
+  _id: ID!
+  bodyText(locale: String, useFallbackLocale: Boolean): ComponentHeroBannerBodyText
+  colorPalette(locale: String, useFallbackLocale: Boolean): String
   contentfulMetadata: ContentfulMetadata!
-  ctaText(locale: String): String
-  headline(locale: String): String
-  heroSize(locale: String): Boolean
-  image(locale: String, preview: Boolean): Asset
-  imageStyle(locale: String): Boolean
-  internalName(locale: String): String
+  ctaText(locale: String, useFallbackLocale: Boolean): String
+  headline(locale: String, useFallbackLocale: Boolean): String
+  heroSize(locale: String, useFallbackLocale: Boolean): Boolean
+  image(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  imageStyle(locale: String, useFallbackLocale: Boolean): Boolean
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): ComponentHeroBannerLinkingCollections
   sys: Sys!
-  targetPage(locale: String, preview: Boolean): ComponentHeroBannerTargetPage
+  targetPage(locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentHeroBannerTargetPage
 }
 
 type ComponentHeroBannerBodyText {
@@ -401,6 +558,25 @@ type ComponentHeroBannerBodyTextEntries {
 type ComponentHeroBannerBodyTextLinks {
   assets: ComponentHeroBannerBodyTextAssets!
   entries: ComponentHeroBannerBodyTextEntries!
+  resources: ComponentHeroBannerBodyTextResources!
+}
+
+type ComponentHeroBannerBodyTextResources {
+  block: [ComponentHeroBannerBodyTextResourcesBlock!]!
+  hyperlink: [ComponentHeroBannerBodyTextResourcesHyperlink!]!
+  inline: [ComponentHeroBannerBodyTextResourcesInline!]!
+}
+
+type ComponentHeroBannerBodyTextResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentHeroBannerBodyTextResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentHeroBannerBodyTextResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 type ComponentHeroBannerCollection {
@@ -408,6 +584,12 @@ type ComponentHeroBannerCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type ComponentHeroBannerCursorCollection {
+  items: [ComponentHeroBanner]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input ComponentHeroBannerFilter {
@@ -457,8 +639,44 @@ input ComponentHeroBannerFilter {
 }
 
 type ComponentHeroBannerLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [ComponentHeroBannerLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [ComponentHeroBannerLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum ComponentHeroBannerLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum ComponentHeroBannerLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum ComponentHeroBannerOrder {
@@ -487,22 +705,24 @@ enum ComponentHeroBannerOrder {
 union ComponentHeroBannerTargetPage = Page
 
 """
-Full-width container for displaying short bits of generic information with optional icons/visuals [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/componentInfoBlock)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/componentInfoBlock)
 """
-type ComponentInfoBlock implements Entry {
-  block1Body(locale: String): ComponentInfoBlockBlock1Body
-  block1Image(locale: String, preview: Boolean): Asset
-  block2Body(locale: String): ComponentInfoBlockBlock2Body
-  block2Image(locale: String, preview: Boolean): Asset
-  block3Body(locale: String): ComponentInfoBlockBlock3Body
-  block3Image(locale: String, preview: Boolean): Asset
-  colorPalette(locale: String): String
+type ComponentInfoBlock implements Entry & _Node {
+  _id: ID!
+  block1Body(locale: String, useFallbackLocale: Boolean): ComponentInfoBlockBlock1Body
+  block1Image(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  block2Body(locale: String, useFallbackLocale: Boolean): ComponentInfoBlockBlock2Body
+  block2Image(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  block3Body(locale: String, useFallbackLocale: Boolean): ComponentInfoBlockBlock3Body
+  block3Image(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  colorPalette(locale: String, useFallbackLocale: Boolean): String
   contentfulMetadata: ContentfulMetadata!
-  headline(locale: String): String
-  internalName(locale: String): String
+  headline(locale: String, useFallbackLocale: Boolean): String
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): ComponentInfoBlockLinkingCollections
-  subline(locale: String): String
+  subline(locale: String, useFallbackLocale: Boolean): String
   sys: Sys!
+  test123(locale: String, preview: Boolean, useFallbackLocale: Boolean, where: VariantContainerFilter): VariantContainer
 }
 
 type ComponentInfoBlockBlock1Body {
@@ -524,6 +744,25 @@ type ComponentInfoBlockBlock1BodyEntries {
 type ComponentInfoBlockBlock1BodyLinks {
   assets: ComponentInfoBlockBlock1BodyAssets!
   entries: ComponentInfoBlockBlock1BodyEntries!
+  resources: ComponentInfoBlockBlock1BodyResources!
+}
+
+type ComponentInfoBlockBlock1BodyResources {
+  block: [ComponentInfoBlockBlock1BodyResourcesBlock!]!
+  hyperlink: [ComponentInfoBlockBlock1BodyResourcesHyperlink!]!
+  inline: [ComponentInfoBlockBlock1BodyResourcesInline!]!
+}
+
+type ComponentInfoBlockBlock1BodyResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentInfoBlockBlock1BodyResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentInfoBlockBlock1BodyResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 type ComponentInfoBlockBlock2Body {
@@ -545,6 +784,25 @@ type ComponentInfoBlockBlock2BodyEntries {
 type ComponentInfoBlockBlock2BodyLinks {
   assets: ComponentInfoBlockBlock2BodyAssets!
   entries: ComponentInfoBlockBlock2BodyEntries!
+  resources: ComponentInfoBlockBlock2BodyResources!
+}
+
+type ComponentInfoBlockBlock2BodyResources {
+  block: [ComponentInfoBlockBlock2BodyResourcesBlock!]!
+  hyperlink: [ComponentInfoBlockBlock2BodyResourcesHyperlink!]!
+  inline: [ComponentInfoBlockBlock2BodyResourcesInline!]!
+}
+
+type ComponentInfoBlockBlock2BodyResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentInfoBlockBlock2BodyResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentInfoBlockBlock2BodyResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 type ComponentInfoBlockBlock3Body {
@@ -566,6 +824,25 @@ type ComponentInfoBlockBlock3BodyEntries {
 type ComponentInfoBlockBlock3BodyLinks {
   assets: ComponentInfoBlockBlock3BodyAssets!
   entries: ComponentInfoBlockBlock3BodyEntries!
+  resources: ComponentInfoBlockBlock3BodyResources!
+}
+
+type ComponentInfoBlockBlock3BodyResources {
+  block: [ComponentInfoBlockBlock3BodyResourcesBlock!]!
+  hyperlink: [ComponentInfoBlockBlock3BodyResourcesHyperlink!]!
+  inline: [ComponentInfoBlockBlock3BodyResourcesInline!]!
+}
+
+type ComponentInfoBlockBlock3BodyResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentInfoBlockBlock3BodyResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentInfoBlockBlock3BodyResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 type ComponentInfoBlockCollection {
@@ -573,6 +850,12 @@ type ComponentInfoBlockCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type ComponentInfoBlockCursorCollection {
+  items: [ComponentInfoBlock]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input ComponentInfoBlockFilter {
@@ -620,11 +903,49 @@ input ComponentInfoBlockFilter {
   subline_not_contains: String
   subline_not_in: [String]
   sys: SysFilter
+  test123: cfVariantContainerNestedFilter
+  test123_exists: Boolean
 }
 
 type ComponentInfoBlockLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [ComponentInfoBlockLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [ComponentInfoBlockLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum ComponentInfoBlockLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum ComponentInfoBlockLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum ComponentInfoBlockOrder {
@@ -647,15 +968,17 @@ enum ComponentInfoBlockOrder {
 }
 
 """
-Component that renders products in a table enabling a side-by-side comparison [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/componentProductTable)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/componentProductTable)
 """
-type ComponentProductTable implements Entry {
+type ComponentProductTable implements Entry & _Node {
+  _id: ID!
   contentfulMetadata: ContentfulMetadata!
-  headline(locale: String): String
-  internalName(locale: String): String
+  headline(locale: String, useFallbackLocale: Boolean): String
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): ComponentProductTableLinkingCollections
-  productsCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): ComponentProductTableProductsCollection
-  subline(locale: String): String
+  productsCollection(limit: Int = 100, locale: String, order: [ComponentProductTableProductsCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: TopicProductFilter): ComponentProductTableProductsCollection
+  productsCursorCollection(limit: Int = 100, locale: String, order: [ComponentProductTableProductsCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: TopicProductFilter): ComponentProductTableProductsCursorCollection
+  subline(locale: String, useFallbackLocale: Boolean): String
   sys: Sys!
 }
 
@@ -664,6 +987,12 @@ type ComponentProductTableCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type ComponentProductTableCursorCollection {
+  items: [ComponentProductTable]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input ComponentProductTableFilter {
@@ -697,8 +1026,44 @@ input ComponentProductTableFilter {
 }
 
 type ComponentProductTableLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [ComponentProductTableLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [ComponentProductTableLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum ComponentProductTableLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum ComponentProductTableLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum ComponentProductTableOrder {
@@ -725,18 +1090,59 @@ type ComponentProductTableProductsCollection {
   total: Int!
 }
 
+enum ComponentProductTableProductsCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  name_ASC
+  name_DESC
+  price_ASC
+  price_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+type ComponentProductTableProductsCursorCollection {
+  items: [TopicProduct]!
+  limit: Int!
+  pages: CursorPages!
+}
+
+enum ComponentProductTableProductsCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  name_ASC
+  name_DESC
+  price_ASC
+  price_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
 """
-Full-width component for quotes, reviews and testimonials, includes multiple layout options [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/componentQuote)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/componentQuote)
 """
-type ComponentQuote implements Entry {
-  colorPalette(locale: String): String
+type ComponentQuote implements Entry & _Node {
+  _id: ID!
+  colorPalette(locale: String, useFallbackLocale: Boolean): String
   contentfulMetadata: ContentfulMetadata!
-  image(locale: String, preview: Boolean): Asset
-  imagePosition(locale: String): Boolean
-  internalName(locale: String): String
+  image(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  imagePosition(locale: String, useFallbackLocale: Boolean): Boolean
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): ComponentQuoteLinkingCollections
-  quote(locale: String): ComponentQuoteQuote
-  quoteAlignment(locale: String): Boolean
+  quote(locale: String, useFallbackLocale: Boolean): ComponentQuoteQuote
+  quoteAlignment(locale: String, useFallbackLocale: Boolean): Boolean
   sys: Sys!
 }
 
@@ -745,6 +1151,12 @@ type ComponentQuoteCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type ComponentQuoteCursorCollection {
+  items: [ComponentQuote]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input ComponentQuoteFilter {
@@ -779,8 +1191,44 @@ input ComponentQuoteFilter {
 }
 
 type ComponentQuoteLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [ComponentQuoteLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [ComponentQuoteLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum ComponentQuoteLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum ComponentQuoteLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum ComponentQuoteOrder {
@@ -821,19 +1269,39 @@ type ComponentQuoteQuoteEntries {
 type ComponentQuoteQuoteLinks {
   assets: ComponentQuoteQuoteAssets!
   entries: ComponentQuoteQuoteEntries!
+  resources: ComponentQuoteQuoteResources!
+}
+
+type ComponentQuoteQuoteResources {
+  block: [ComponentQuoteQuoteResourcesBlock!]!
+  hyperlink: [ComponentQuoteQuoteResourcesHyperlink!]!
+  inline: [ComponentQuoteQuoteResourcesInline!]!
+}
+
+type ComponentQuoteQuoteResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentQuoteQuoteResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentQuoteQuoteResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 """
-Constrained-width component for displaying ad-hoc paragraphs of text (FAQs, intros, descriptions) [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/componentTextBlock)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/componentTextBlock)
 """
-type ComponentTextBlock implements Entry {
-  body(locale: String): ComponentTextBlockBody
-  colorPalette(locale: String): String
+type ComponentTextBlock implements Entry & _Node {
+  _id: ID!
+  body(locale: String, useFallbackLocale: Boolean): ComponentTextBlockBody
+  colorPalette(locale: String, useFallbackLocale: Boolean): String
   contentfulMetadata: ContentfulMetadata!
-  headline(locale: String): String
-  internalName(locale: String): String
+  headline(locale: String, useFallbackLocale: Boolean): String
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): ComponentTextBlockLinkingCollections
-  subline(locale: String): String
+  subline(locale: String, useFallbackLocale: Boolean): String
   sys: Sys!
 }
 
@@ -856,6 +1324,25 @@ type ComponentTextBlockBodyEntries {
 type ComponentTextBlockBodyLinks {
   assets: ComponentTextBlockBodyAssets!
   entries: ComponentTextBlockBodyEntries!
+  resources: ComponentTextBlockBodyResources!
+}
+
+type ComponentTextBlockBodyResources {
+  block: [ComponentTextBlockBodyResourcesBlock!]!
+  hyperlink: [ComponentTextBlockBodyResourcesHyperlink!]!
+  inline: [ComponentTextBlockBodyResourcesInline!]!
+}
+
+type ComponentTextBlockBodyResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentTextBlockBodyResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type ComponentTextBlockBodyResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 type ComponentTextBlockCollection {
@@ -863,6 +1350,12 @@ type ComponentTextBlockCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type ComponentTextBlockCursorCollection {
+  items: [ComponentTextBlock]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input ComponentTextBlockFilter {
@@ -904,8 +1397,44 @@ input ComponentTextBlockFilter {
 }
 
 type ComponentTextBlockLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [ComponentTextBlockLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [ComponentTextBlockLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum ComponentTextBlockLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum ComponentTextBlockLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum ComponentTextBlockOrder {
@@ -928,10 +1457,26 @@ enum ComponentTextBlockOrder {
 }
 
 type ContentfulMetadata {
+  concepts: [TaxonomyConcept]!
   tags: [ContentfulTag]!
 }
 
+input ContentfulMetadataConceptsDescendantsFilter {
+  id_contains_all: [String]
+  id_contains_none: [String]
+  id_contains_some: [String]
+}
+
+input ContentfulMetadataConceptsFilter {
+  descendants: ContentfulMetadataConceptsDescendantsFilter
+  id_contains_all: [String]
+  id_contains_none: [String]
+  id_contains_some: [String]
+}
+
 input ContentfulMetadataFilter {
+  concepts: ContentfulMetadataConceptsFilter
+  concepts_exists: Boolean
   tags: ContentfulMetadataTagsFilter
   tags_exists: Boolean
 }
@@ -944,11 +1489,16 @@ input ContentfulMetadataTagsFilter {
 
 """
 Represents a tag entity for finding and organizing content easily.
-    Find out more here: https://www.contentful.com/developers/docs/references/content-delivery-api/#/reference/content-tags
+      Find out more here: https://www.contentful.com/developers/docs/references/content-delivery-api/#/reference/content-tags
 """
 type ContentfulTag {
   id: String
   name: String
+}
+
+type CursorPages {
+  next: String
+  prev: String
 }
 
 """
@@ -976,6 +1526,12 @@ type EntryCollection {
   total: Int!
 }
 
+type EntryCursorCollection {
+  items: [Entry]!
+  limit: Int!
+  pages: CursorPages!
+}
+
 input EntryFilter {
   AND: [EntryFilter]
   OR: [EntryFilter]
@@ -995,19 +1551,21 @@ enum EntryOrder {
 }
 
 """
-Navigation content type used for powering the Footer menu [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/footerMenu)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/footerMenu)
 """
-type FooterMenu implements Entry {
+type FooterMenu implements Entry & _Node {
+  _id: ID!
   contentfulMetadata: ContentfulMetadata!
-  facebookLink(locale: String): String
-  instagramLink(locale: String): String
-  internalName(locale: String): String
-  legalLinks(locale: String, preview: Boolean): MenuGroup
+  facebookLink(locale: String, useFallbackLocale: Boolean): String
+  instagramLink(locale: String, useFallbackLocale: Boolean): String
+  internalName(locale: String, useFallbackLocale: Boolean): String
+  legalLinks(locale: String, preview: Boolean, useFallbackLocale: Boolean, where: MenuGroupFilter): MenuGroup
   linkedFrom(allowedLocales: [String]): FooterMenuLinkingCollections
-  linkedinLink(locale: String): String
-  menuItemsCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): FooterMenuMenuItemsCollection
+  linkedinLink(locale: String, useFallbackLocale: Boolean): String
+  menuItemsCollection(limit: Int = 100, locale: String, order: [FooterMenuMenuItemsCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: MenuGroupFilter): FooterMenuMenuItemsCollection
+  menuItemsCursorCollection(limit: Int = 100, locale: String, order: [FooterMenuMenuItemsCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: MenuGroupFilter): FooterMenuMenuItemsCursorCollection
   sys: Sys!
-  twitterLink(locale: String): String
+  twitterLink(locale: String, useFallbackLocale: Boolean): String
 }
 
 type FooterMenuCollection {
@@ -1015,6 +1573,12 @@ type FooterMenuCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type FooterMenuCursorCollection {
+  items: [FooterMenu]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input FooterMenuFilter {
@@ -1064,7 +1628,8 @@ input FooterMenuFilter {
 }
 
 type FooterMenuLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
 }
 
 type FooterMenuMenuItemsCollection {
@@ -1072,6 +1637,42 @@ type FooterMenuMenuItemsCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+enum FooterMenuMenuItemsCollectionOrder {
+  groupName_ASC
+  groupName_DESC
+  internalTitle_ASC
+  internalTitle_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+type FooterMenuMenuItemsCursorCollection {
+  items: [MenuGroup]!
+  limit: Int!
+  pages: CursorPages!
+}
+
+enum FooterMenuMenuItemsCursorCollectionOrder {
+  groupName_ASC
+  groupName_DESC
+  internalTitle_ASC
+  internalTitle_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum FooterMenuOrder {
@@ -1099,6 +1700,7 @@ enum FooterMenuOrder {
 scalar HexColor
 
 enum ImageFormat {
+  """AVIF image format."""
   AVIF
 
   """JPG image format."""
@@ -1232,14 +1834,16 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 scalar JSON
 
 """
-A group of items making up a section in the navigation menu [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/menuGroup)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/menuGroup)
 """
-type MenuGroup implements Entry {
+type MenuGroup implements Entry & _Node {
+  _id: ID!
   contentfulMetadata: ContentfulMetadata!
-  featuredPagesCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): MenuGroupFeaturedPagesCollection
-  groupLink(locale: String, preview: Boolean): MenuGroupGroupLink
-  groupName(locale: String): String
-  internalTitle(locale: String): String
+  featuredPagesCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: MenuGroupFeaturedPagesFilter): MenuGroupFeaturedPagesCollection
+  featuredPagesCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: MenuGroupFeaturedPagesFilter): MenuGroupFeaturedPagesCursorCollection
+  groupLink(locale: String, preview: Boolean, useFallbackLocale: Boolean, where: MenuGroupGroupLinkFilter): MenuGroupGroupLink
+  groupName(locale: String, useFallbackLocale: Boolean): String
+  internalTitle(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): MenuGroupLinkingCollections
   sys: Sys!
 }
@@ -1251,11 +1855,58 @@ type MenuGroupCollection {
   total: Int!
 }
 
+type MenuGroupCursorCollection {
+  items: [MenuGroup]!
+  limit: Int!
+  pages: CursorPages!
+}
+
 type MenuGroupFeaturedPagesCollection {
   items: [MenuGroupFeaturedPagesItem]!
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type MenuGroupFeaturedPagesCursorCollection {
+  items: [MenuGroupFeaturedPagesItem]!
+  limit: Int!
+  pages: CursorPages!
+}
+
+input MenuGroupFeaturedPagesFilter {
+  AND: [MenuGroupFeaturedPagesFilter]
+  OR: [MenuGroupFeaturedPagesFilter]
+  blackCardCtaText_exists: Boolean
+  contentfulMetadata: ContentfulMetadataFilter
+  extraSection: cfextraSectionMultiTypeNestedFilter
+  extraSectionCollection_exists: Boolean
+  internalName: String
+  internalName_contains: String
+  internalName_exists: Boolean
+  internalName_in: [String]
+  internalName_not: String
+  internalName_not_contains: String
+  internalName_not_in: [String]
+  pageContent_exists: Boolean
+  pageName: String
+  pageName_contains: String
+  pageName_exists: Boolean
+  pageName_in: [String]
+  pageName_not: String
+  pageName_not_contains: String
+  pageName_not_in: [String]
+  seo_exists: Boolean
+  slug: String
+  slug_contains: String
+  slug_exists: Boolean
+  slug_in: [String]
+  slug_not: String
+  slug_not_contains: String
+  slug_not_in: [String]
+  sys: SysFilter
+  topSection: cftopSectionMultiTypeNestedFilter
+  topSectionCollection_exists: Boolean
 }
 
 union MenuGroupFeaturedPagesItem = Page
@@ -1264,7 +1915,9 @@ input MenuGroupFilter {
   AND: [MenuGroupFilter]
   OR: [MenuGroupFilter]
   contentfulMetadata: ContentfulMetadataFilter
+  featuredPages: cffeaturedPagesMultiTypeNestedFilter
   featuredPagesCollection_exists: Boolean
+  groupLink: cfgroupLinkMultiTypeNestedFilter
   groupLink_exists: Boolean
   groupName: String
   groupName_contains: String
@@ -1285,10 +1938,116 @@ input MenuGroupFilter {
 
 union MenuGroupGroupLink = Page
 
+input MenuGroupGroupLinkFilter {
+  AND: [MenuGroupGroupLinkFilter]
+  OR: [MenuGroupGroupLinkFilter]
+  blackCardCtaText_exists: Boolean
+  contentfulMetadata: ContentfulMetadataFilter
+  extraSection: cfextraSectionMultiTypeNestedFilter
+  extraSectionCollection_exists: Boolean
+  internalName: String
+  internalName_contains: String
+  internalName_exists: Boolean
+  internalName_in: [String]
+  internalName_not: String
+  internalName_not_contains: String
+  internalName_not_in: [String]
+  pageContent_exists: Boolean
+  pageName: String
+  pageName_contains: String
+  pageName_exists: Boolean
+  pageName_in: [String]
+  pageName_not: String
+  pageName_not_contains: String
+  pageName_not_in: [String]
+  seo_exists: Boolean
+  slug: String
+  slug_contains: String
+  slug_exists: Boolean
+  slug_in: [String]
+  slug_not: String
+  slug_not_contains: String
+  slug_not_in: [String]
+  sys: SysFilter
+  topSection: cftopSectionMultiTypeNestedFilter
+  topSectionCollection_exists: Boolean
+}
+
 type MenuGroupLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  footerMenuCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): FooterMenuCollection
-  navigationMenuCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): NavigationMenuCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  footerMenuCollection(limit: Int = 100, locale: String, order: [MenuGroupLinkingCollectionsFooterMenuCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): FooterMenuCollection
+  footerMenuCursorCollection(limit: Int = 100, locale: String, order: [MenuGroupLinkingCollectionsFooterMenuCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): FooterMenuCursorCollection
+  navigationMenuCollection(limit: Int = 100, locale: String, order: [MenuGroupLinkingCollectionsNavigationMenuCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): NavigationMenuCollection
+  navigationMenuCursorCollection(limit: Int = 100, locale: String, order: [MenuGroupLinkingCollectionsNavigationMenuCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): NavigationMenuCursorCollection
+}
+
+enum MenuGroupLinkingCollectionsFooterMenuCollectionOrder {
+  facebookLink_ASC
+  facebookLink_DESC
+  instagramLink_ASC
+  instagramLink_DESC
+  internalName_ASC
+  internalName_DESC
+  linkedinLink_ASC
+  linkedinLink_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+  twitterLink_ASC
+  twitterLink_DESC
+}
+
+enum MenuGroupLinkingCollectionsFooterMenuCursorCollectionOrder {
+  facebookLink_ASC
+  facebookLink_DESC
+  instagramLink_ASC
+  instagramLink_DESC
+  internalName_ASC
+  internalName_DESC
+  linkedinLink_ASC
+  linkedinLink_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+  twitterLink_ASC
+  twitterLink_DESC
+}
+
+enum MenuGroupLinkingCollectionsNavigationMenuCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum MenuGroupLinkingCollectionsNavigationMenuCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum MenuGroupOrder {
@@ -1307,13 +2066,15 @@ enum MenuGroupOrder {
 }
 
 """
-Navigation menu in the header [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/navigationMenu)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/navigationMenu)
 """
-type NavigationMenu implements Entry {
+type NavigationMenu implements Entry & _Node {
+  _id: ID!
   contentfulMetadata: ContentfulMetadata!
-  internalName(locale: String): String
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): NavigationMenuLinkingCollections
-  menuItemsCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): NavigationMenuMenuItemsCollection
+  menuItemsCollection(limit: Int = 100, locale: String, order: [NavigationMenuMenuItemsCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: MenuGroupFilter): NavigationMenuMenuItemsCollection
+  menuItemsCursorCollection(limit: Int = 100, locale: String, order: [NavigationMenuMenuItemsCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: MenuGroupFilter): NavigationMenuMenuItemsCursorCollection
   sys: Sys!
 }
 
@@ -1322,6 +2083,12 @@ type NavigationMenuCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type NavigationMenuCursorCollection {
+  items: [NavigationMenu]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input NavigationMenuFilter {
@@ -1341,7 +2108,8 @@ input NavigationMenuFilter {
 }
 
 type NavigationMenuLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
 }
 
 type NavigationMenuMenuItemsCollection {
@@ -1349,6 +2117,42 @@ type NavigationMenuMenuItemsCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+enum NavigationMenuMenuItemsCollectionOrder {
+  groupName_ASC
+  groupName_DESC
+  internalTitle_ASC
+  internalTitle_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+type NavigationMenuMenuItemsCursorCollection {
+  items: [MenuGroup]!
+  limit: Int!
+  pages: CursorPages!
+}
+
+enum NavigationMenuMenuItemsCursorCollectionOrder {
+  groupName_ASC
+  groupName_DESC
+  internalTitle_ASC
+  internalTitle_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum NavigationMenuOrder {
@@ -1365,19 +2169,23 @@ enum NavigationMenuOrder {
 }
 
 """
-Container that enables editors to publish a page, define its slug, select & arrange its content [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/page)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/page)
 """
-type Page implements Entry {
+type Page implements Entry & _Node {
+  _id: ID!
+  blackCardCtaText(locale: String, preview: Boolean, useFallbackLocale: Boolean, where: VariantContainerFilter): VariantContainer
   contentfulMetadata: ContentfulMetadata!
-  extraSectionCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageExtraSectionCollection
-  internalName(locale: String): String
+  extraSectionCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: PageExtraSectionFilter): PageExtraSectionCollection
+  extraSectionCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: PageExtraSectionFilter): PageExtraSectionCursorCollection
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): PageLinkingCollections
-  pageContent(locale: String, preview: Boolean): PagePageContent
-  pageName(locale: String): String
-  seo(locale: String, preview: Boolean): Seo
-  slug(locale: String): String
+  pageContent(locale: String, preview: Boolean, useFallbackLocale: Boolean): PagePageContent
+  pageName(locale: String, useFallbackLocale: Boolean): String
+  seo(locale: String, preview: Boolean, useFallbackLocale: Boolean, where: SeoFilter): Seo
+  slug(locale: String, useFallbackLocale: Boolean): String
   sys: Sys!
-  topSectionCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageTopSectionCollection
+  topSectionCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: PageTopSectionFilter): PageTopSectionCollection
+  topSectionCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: PageTopSectionFilter): PageTopSectionCursorCollection
 }
 
 type PageCollection {
@@ -1387,6 +2195,12 @@ type PageCollection {
   total: Int!
 }
 
+type PageCursorCollection {
+  items: [Page]!
+  limit: Int!
+  pages: CursorPages!
+}
+
 type PageExtraSectionCollection {
   items: [PageExtraSectionItem]!
   limit: Int!
@@ -1394,12 +2208,42 @@ type PageExtraSectionCollection {
   total: Int!
 }
 
+type PageExtraSectionCursorCollection {
+  items: [PageExtraSectionItem]!
+  limit: Int!
+  pages: CursorPages!
+}
+
+input PageExtraSectionFilter {
+  AND: [PageExtraSectionFilter]
+  OR: [PageExtraSectionFilter]
+  colorPalette: String
+  colorPalette_contains: String
+  colorPalette_exists: Boolean
+  colorPalette_in: [String]
+  colorPalette_not: String
+  colorPalette_not_contains: String
+  colorPalette_not_in: [String]
+  contentfulMetadata: ContentfulMetadataFilter
+  internalName: String
+  internalName_contains: String
+  internalName_exists: Boolean
+  internalName_in: [String]
+  internalName_not: String
+  internalName_not_contains: String
+  internalName_not_in: [String]
+  sys: SysFilter
+}
+
 union PageExtraSectionItem = ComponentCta | ComponentDuplex | ComponentHeroBanner | ComponentInfoBlock | ComponentQuote | ComponentTextBlock
 
 input PageFilter {
   AND: [PageFilter]
   OR: [PageFilter]
+  blackCardCtaText: cfVariantContainerNestedFilter
+  blackCardCtaText_exists: Boolean
   contentfulMetadata: ContentfulMetadataFilter
+  extraSection: cfextraSectionMultiTypeNestedFilter
   extraSectionCollection_exists: Boolean
   internalName: String
   internalName_contains: String
@@ -1426,15 +2270,185 @@ input PageFilter {
   slug_not_contains: String
   slug_not_in: [String]
   sys: SysFilter
+  topSection: cftopSectionMultiTypeNestedFilter
   topSectionCollection_exists: Boolean
 }
 
 type PageLinkingCollections {
-  componentCtaCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): ComponentCtaCollection
-  componentDuplexCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): ComponentDuplexCollection
-  componentHeroBannerCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): ComponentHeroBannerCollection
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  menuGroupCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): MenuGroupCollection
+  componentCtaCollection(limit: Int = 100, locale: String, order: [PageLinkingCollectionsComponentCtaCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentCtaCollection
+  componentCtaCursorCollection(limit: Int = 100, locale: String, order: [PageLinkingCollectionsComponentCtaCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentCtaCursorCollection
+  componentDuplexCollection(limit: Int = 100, locale: String, order: [PageLinkingCollectionsComponentDuplexCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentDuplexCollection
+  componentDuplexCursorCollection(limit: Int = 100, locale: String, order: [PageLinkingCollectionsComponentDuplexCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentDuplexCursorCollection
+  componentHeroBannerCollection(limit: Int = 100, locale: String, order: [PageLinkingCollectionsComponentHeroBannerCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentHeroBannerCollection
+  componentHeroBannerCursorCollection(limit: Int = 100, locale: String, order: [PageLinkingCollectionsComponentHeroBannerCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentHeroBannerCursorCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  menuGroupCollection(limit: Int = 100, locale: String, order: [PageLinkingCollectionsMenuGroupCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): MenuGroupCollection
+  menuGroupCursorCollection(limit: Int = 100, locale: String, order: [PageLinkingCollectionsMenuGroupCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): MenuGroupCursorCollection
+}
+
+enum PageLinkingCollectionsComponentCtaCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  ctaText_ASC
+  ctaText_DESC
+  headline_ASC
+  headline_DESC
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+  urlParameters_ASC
+  urlParameters_DESC
+}
+
+enum PageLinkingCollectionsComponentCtaCursorCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  ctaText_ASC
+  ctaText_DESC
+  headline_ASC
+  headline_DESC
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+  urlParameters_ASC
+  urlParameters_DESC
+}
+
+enum PageLinkingCollectionsComponentDuplexCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  containerLayout_ASC
+  containerLayout_DESC
+  ctaText_ASC
+  ctaText_DESC
+  headline_ASC
+  headline_DESC
+  imageStyle_ASC
+  imageStyle_DESC
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum PageLinkingCollectionsComponentDuplexCursorCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  containerLayout_ASC
+  containerLayout_DESC
+  ctaText_ASC
+  ctaText_DESC
+  headline_ASC
+  headline_DESC
+  imageStyle_ASC
+  imageStyle_DESC
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum PageLinkingCollectionsComponentHeroBannerCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  ctaText_ASC
+  ctaText_DESC
+  headline_ASC
+  headline_DESC
+  heroSize_ASC
+  heroSize_DESC
+  imageStyle_ASC
+  imageStyle_DESC
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum PageLinkingCollectionsComponentHeroBannerCursorCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  ctaText_ASC
+  ctaText_DESC
+  headline_ASC
+  headline_DESC
+  heroSize_ASC
+  heroSize_DESC
+  imageStyle_ASC
+  imageStyle_DESC
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum PageLinkingCollectionsMenuGroupCollectionOrder {
+  groupName_ASC
+  groupName_DESC
+  internalTitle_ASC
+  internalTitle_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum PageLinkingCollectionsMenuGroupCursorCollectionOrder {
+  groupName_ASC
+  groupName_DESC
+  internalTitle_ASC
+  internalTitle_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum PageOrder {
@@ -1463,6 +2477,33 @@ type PageTopSectionCollection {
   total: Int!
 }
 
+type PageTopSectionCursorCollection {
+  items: [PageTopSectionItem]!
+  limit: Int!
+  pages: CursorPages!
+}
+
+input PageTopSectionFilter {
+  AND: [PageTopSectionFilter]
+  OR: [PageTopSectionFilter]
+  colorPalette: String
+  colorPalette_contains: String
+  colorPalette_exists: Boolean
+  colorPalette_in: [String]
+  colorPalette_not: String
+  colorPalette_not_contains: String
+  colorPalette_not_in: [String]
+  contentfulMetadata: ContentfulMetadataFilter
+  internalName: String
+  internalName_contains: String
+  internalName_exists: Boolean
+  internalName_in: [String]
+  internalName_not: String
+  internalName_not_contains: String
+  internalName_not_in: [String]
+  sys: SysFilter
+}
+
 union PageTopSectionItem = ComponentCta | ComponentDuplex | ComponentHeroBanner | ComponentInfoBlock | ComponentQuote | ComponentTextBlock
 
 """
@@ -1471,56 +2512,89 @@ The 'Quality' type represents quality as whole numeric values between `1` and `1
 scalar Quality
 
 type Query {
-  asset(id: String!, locale: String, preview: Boolean): Asset
-  assetCollection(limit: Int = 100, locale: String, order: [AssetOrder], preview: Boolean, skip: Int = 0, where: AssetFilter): AssetCollection
-  componentCta(id: String!, locale: String, preview: Boolean): ComponentCta
-  componentCtaCollection(limit: Int = 100, locale: String, order: [ComponentCtaOrder], preview: Boolean, skip: Int = 0, where: ComponentCtaFilter): ComponentCtaCollection
-  componentDuplex(id: String!, locale: String, preview: Boolean): ComponentDuplex
-  componentDuplexCollection(limit: Int = 100, locale: String, order: [ComponentDuplexOrder], preview: Boolean, skip: Int = 0, where: ComponentDuplexFilter): ComponentDuplexCollection
-  componentHeroBanner(id: String!, locale: String, preview: Boolean): ComponentHeroBanner
-  componentHeroBannerCollection(limit: Int = 100, locale: String, order: [ComponentHeroBannerOrder], preview: Boolean, skip: Int = 0, where: ComponentHeroBannerFilter): ComponentHeroBannerCollection
-  componentInfoBlock(id: String!, locale: String, preview: Boolean): ComponentInfoBlock
-  componentInfoBlockCollection(limit: Int = 100, locale: String, order: [ComponentInfoBlockOrder], preview: Boolean, skip: Int = 0, where: ComponentInfoBlockFilter): ComponentInfoBlockCollection
-  componentProductTable(id: String!, locale: String, preview: Boolean): ComponentProductTable
-  componentProductTableCollection(limit: Int = 100, locale: String, order: [ComponentProductTableOrder], preview: Boolean, skip: Int = 0, where: ComponentProductTableFilter): ComponentProductTableCollection
-  componentQuote(id: String!, locale: String, preview: Boolean): ComponentQuote
-  componentQuoteCollection(limit: Int = 100, locale: String, order: [ComponentQuoteOrder], preview: Boolean, skip: Int = 0, where: ComponentQuoteFilter): ComponentQuoteCollection
-  componentTextBlock(id: String!, locale: String, preview: Boolean): ComponentTextBlock
-  componentTextBlockCollection(limit: Int = 100, locale: String, order: [ComponentTextBlockOrder], preview: Boolean, skip: Int = 0, where: ComponentTextBlockFilter): ComponentTextBlockCollection
-  entryCollection(limit: Int = 100, locale: String, order: [EntryOrder], preview: Boolean, skip: Int = 0, where: EntryFilter): EntryCollection
-  footerMenu(id: String!, locale: String, preview: Boolean): FooterMenu
-  footerMenuCollection(limit: Int = 100, locale: String, order: [FooterMenuOrder], preview: Boolean, skip: Int = 0, where: FooterMenuFilter): FooterMenuCollection
-  menuGroup(id: String!, locale: String, preview: Boolean): MenuGroup
-  menuGroupCollection(limit: Int = 100, locale: String, order: [MenuGroupOrder], preview: Boolean, skip: Int = 0, where: MenuGroupFilter): MenuGroupCollection
-  navigationMenu(id: String!, locale: String, preview: Boolean): NavigationMenu
-  navigationMenuCollection(limit: Int = 100, locale: String, order: [NavigationMenuOrder], preview: Boolean, skip: Int = 0, where: NavigationMenuFilter): NavigationMenuCollection
-  page(id: String!, locale: String, preview: Boolean): Page
-  pageCollection(limit: Int = 100, locale: String, order: [PageOrder], preview: Boolean, skip: Int = 0, where: PageFilter): PageCollection
-  seo(id: String!, locale: String, preview: Boolean): Seo
-  seoCollection(limit: Int = 100, locale: String, order: [SeoOrder], preview: Boolean, skip: Int = 0, where: SeoFilter): SeoCollection
-  topicBusinessInfo(id: String!, locale: String, preview: Boolean): TopicBusinessInfo
-  topicBusinessInfoCollection(limit: Int = 100, locale: String, order: [TopicBusinessInfoOrder], preview: Boolean, skip: Int = 0, where: TopicBusinessInfoFilter): TopicBusinessInfoCollection
-  topicPerson(id: String!, locale: String, preview: Boolean): TopicPerson
-  topicPersonCollection(limit: Int = 100, locale: String, order: [TopicPersonOrder], preview: Boolean, skip: Int = 0, where: TopicPersonFilter): TopicPersonCollection
-  topicProduct(id: String!, locale: String, preview: Boolean): TopicProduct
-  topicProductCollection(limit: Int = 100, locale: String, order: [TopicProductOrder], preview: Boolean, skip: Int = 0, where: TopicProductFilter): TopicProductCollection
-  topicProductFeature(id: String!, locale: String, preview: Boolean): TopicProductFeature
-  topicProductFeatureCollection(limit: Int = 100, locale: String, order: [TopicProductFeatureOrder], preview: Boolean, skip: Int = 0, where: TopicProductFeatureFilter): TopicProductFeatureCollection
+  _node(id: ID!, locale: String, preview: Boolean, useFallbackLocale: Boolean): _Node
+  _nodes(ids: [ID!]!, locale: String, preview: Boolean, useFallbackLocale: Boolean): [_Node]!
+  asset(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  assetCollection(limit: Int = 100, locale: String, order: [AssetOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: AssetFilter): AssetCollection
+  assetCursorCollection(limit: Int = 100, locale: String, order: [AssetOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: AssetFilter): AssetCursorCollection
+  componentCta(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentCta
+  componentCtaCollection(limit: Int = 100, locale: String, order: [ComponentCtaOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: ComponentCtaFilter): ComponentCtaCollection
+  componentCtaCursorCollection(limit: Int = 100, locale: String, order: [ComponentCtaOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: ComponentCtaFilter): ComponentCtaCursorCollection
+  componentDuplex(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentDuplex
+  componentDuplexCollection(limit: Int = 100, locale: String, order: [ComponentDuplexOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: ComponentDuplexFilter): ComponentDuplexCollection
+  componentDuplexCursorCollection(limit: Int = 100, locale: String, order: [ComponentDuplexOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: ComponentDuplexFilter): ComponentDuplexCursorCollection
+  componentHeroBanner(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentHeroBanner
+  componentHeroBannerCollection(limit: Int = 100, locale: String, order: [ComponentHeroBannerOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: ComponentHeroBannerFilter): ComponentHeroBannerCollection
+  componentHeroBannerCursorCollection(limit: Int = 100, locale: String, order: [ComponentHeroBannerOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: ComponentHeroBannerFilter): ComponentHeroBannerCursorCollection
+  componentInfoBlock(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentInfoBlock
+  componentInfoBlockCollection(limit: Int = 100, locale: String, order: [ComponentInfoBlockOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: ComponentInfoBlockFilter): ComponentInfoBlockCollection
+  componentInfoBlockCursorCollection(limit: Int = 100, locale: String, order: [ComponentInfoBlockOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: ComponentInfoBlockFilter): ComponentInfoBlockCursorCollection
+  componentProductTable(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentProductTable
+  componentProductTableCollection(limit: Int = 100, locale: String, order: [ComponentProductTableOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: ComponentProductTableFilter): ComponentProductTableCollection
+  componentProductTableCursorCollection(limit: Int = 100, locale: String, order: [ComponentProductTableOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: ComponentProductTableFilter): ComponentProductTableCursorCollection
+  componentQuote(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentQuote
+  componentQuoteCollection(limit: Int = 100, locale: String, order: [ComponentQuoteOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: ComponentQuoteFilter): ComponentQuoteCollection
+  componentQuoteCursorCollection(limit: Int = 100, locale: String, order: [ComponentQuoteOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: ComponentQuoteFilter): ComponentQuoteCursorCollection
+  componentTextBlock(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentTextBlock
+  componentTextBlockCollection(limit: Int = 100, locale: String, order: [ComponentTextBlockOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: ComponentTextBlockFilter): ComponentTextBlockCollection
+  componentTextBlockCursorCollection(limit: Int = 100, locale: String, order: [ComponentTextBlockOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: ComponentTextBlockFilter): ComponentTextBlockCursorCollection
+  entryCollection(limit: Int = 100, locale: String, order: [EntryOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: EntryFilter): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, order: [EntryOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: EntryFilter): EntryCursorCollection
+  footerMenu(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): FooterMenu
+  footerMenuCollection(limit: Int = 100, locale: String, order: [FooterMenuOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: FooterMenuFilter): FooterMenuCollection
+  footerMenuCursorCollection(limit: Int = 100, locale: String, order: [FooterMenuOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: FooterMenuFilter): FooterMenuCursorCollection
+  menuGroup(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): MenuGroup
+  menuGroupCollection(limit: Int = 100, locale: String, order: [MenuGroupOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: MenuGroupFilter): MenuGroupCollection
+  menuGroupCursorCollection(limit: Int = 100, locale: String, order: [MenuGroupOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: MenuGroupFilter): MenuGroupCursorCollection
+  navigationMenu(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): NavigationMenu
+  navigationMenuCollection(limit: Int = 100, locale: String, order: [NavigationMenuOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: NavigationMenuFilter): NavigationMenuCollection
+  navigationMenuCursorCollection(limit: Int = 100, locale: String, order: [NavigationMenuOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: NavigationMenuFilter): NavigationMenuCursorCollection
+  page(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): Page
+  pageCollection(limit: Int = 100, locale: String, order: [PageOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: PageFilter): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [PageOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: PageFilter): PageCursorCollection
+  seo(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): Seo
+  seoCollection(limit: Int = 100, locale: String, order: [SeoOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: SeoFilter): SeoCollection
+  seoCursorCollection(limit: Int = 100, locale: String, order: [SeoOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: SeoFilter): SeoCursorCollection
+  topicBusinessInfo(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): TopicBusinessInfo
+  topicBusinessInfoCollection(limit: Int = 100, locale: String, order: [TopicBusinessInfoOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: TopicBusinessInfoFilter): TopicBusinessInfoCollection
+  topicBusinessInfoCursorCollection(limit: Int = 100, locale: String, order: [TopicBusinessInfoOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: TopicBusinessInfoFilter): TopicBusinessInfoCursorCollection
+  topicPerson(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): TopicPerson
+  topicPersonCollection(limit: Int = 100, locale: String, order: [TopicPersonOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: TopicPersonFilter): TopicPersonCollection
+  topicPersonCursorCollection(limit: Int = 100, locale: String, order: [TopicPersonOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: TopicPersonFilter): TopicPersonCursorCollection
+  topicProduct(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): TopicProduct
+  topicProductCollection(limit: Int = 100, locale: String, order: [TopicProductOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: TopicProductFilter): TopicProductCollection
+  topicProductCursorCollection(limit: Int = 100, locale: String, order: [TopicProductOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: TopicProductFilter): TopicProductCursorCollection
+  topicProductFeature(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): TopicProductFeature
+  topicProductFeatureCollection(limit: Int = 100, locale: String, order: [TopicProductFeatureOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: TopicProductFeatureFilter): TopicProductFeatureCollection
+  topicProductFeatureCursorCollection(limit: Int = 100, locale: String, order: [TopicProductFeatureOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: TopicProductFeatureFilter): TopicProductFeatureCursorCollection
+  variantContainer(id: String!, locale: String, preview: Boolean, useFallbackLocale: Boolean): VariantContainer
+  variantContainerCollection(limit: Int = 100, locale: String, order: [VariantContainerOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: VariantContainerFilter): VariantContainerCollection
+  variantContainerCursorCollection(limit: Int = 100, locale: String, order: [VariantContainerOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: VariantContainerFilter): VariantContainerCursorCollection
+}
+
+interface ResourceLink {
+  sys: ResourceSys!
+}
+
+type ResourceSys {
+  linkType: String!
+  urn: String!
 }
 
 """
-Open Graph (OG) meta tags for optimizing SEO visibility [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/seo)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/seo)
 """
-type Seo implements Entry {
+type Seo implements Entry & _Node {
+  _id: ID!
   contentfulMetadata: ContentfulMetadata!
-  description(locale: String): String
-  image(locale: String, preview: Boolean): Asset
+  description(locale: String, useFallbackLocale: Boolean): String
+  image(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
   linkedFrom(allowedLocales: [String]): SeoLinkingCollections
-  name(locale: String): String
-  noFollow(locale: String): Boolean
-  noIndex(locale: String): Boolean
+  name(locale: String, useFallbackLocale: Boolean): String
+  noFollow(locale: String, useFallbackLocale: Boolean): Boolean
+  noIndex(locale: String, useFallbackLocale: Boolean): Boolean
   sys: Sys!
-  title(locale: String): String
+  title(locale: String, useFallbackLocale: Boolean): String
 }
 
 type SeoCollection {
@@ -1528,6 +2602,12 @@ type SeoCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type SeoCursorCollection {
+  items: [Seo]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input SeoFilter {
@@ -1566,8 +2646,44 @@ input SeoFilter {
 }
 
 type SeoLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [SeoLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [SeoLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum SeoLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum SeoLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum SeoOrder {
@@ -1595,6 +2711,9 @@ type Sys {
   environmentId: String!
   firstPublishedAt: DateTime
   id: String!
+
+  """The locale that was requested."""
+  locale: String
   publishedAt: DateTime
   publishedVersion: Int
   spaceId: String!
@@ -1638,16 +2757,33 @@ input SysFilter {
 }
 
 """
-Container for ever-green content like About us, Career pages, FAQ, Knowledge base & more [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/topicBusinessInfo)
+Represents a taxonomy concept entity for finding and organizing content easily.
+        Find out more here: https://www.contentful.com/developers/docs/references/content-delivery-api/#/reference/content-concepts
 """
-type TopicBusinessInfo implements Entry {
-  body(locale: String): TopicBusinessInfoBody
+type TaxonomyConcept {
+  id: String
+}
+
+input TimelineFilterInput {
+  """Preview content starting from a given release date"""
+  release_lte: String
+
+  """Preview content starting from a given timestamp"""
+  timestamp_lte: DateTime
+}
+
+"""
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/topicBusinessInfo)
+"""
+type TopicBusinessInfo implements Entry & _Node {
+  _id: ID!
+  body(locale: String, useFallbackLocale: Boolean): TopicBusinessInfoBody
   contentfulMetadata: ContentfulMetadata!
-  featuredImage(locale: String, preview: Boolean): Asset
-  internalName(locale: String): String
+  featuredImage(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): TopicBusinessInfoLinkingCollections
-  name(locale: String): String
-  shortDescription(locale: String): String
+  name(locale: String, useFallbackLocale: Boolean): String
+  shortDescription(locale: String, useFallbackLocale: Boolean): String
   sys: Sys!
 }
 
@@ -1670,6 +2806,25 @@ type TopicBusinessInfoBodyEntries {
 type TopicBusinessInfoBodyLinks {
   assets: TopicBusinessInfoBodyAssets!
   entries: TopicBusinessInfoBodyEntries!
+  resources: TopicBusinessInfoBodyResources!
+}
+
+type TopicBusinessInfoBodyResources {
+  block: [TopicBusinessInfoBodyResourcesBlock!]!
+  hyperlink: [TopicBusinessInfoBodyResourcesHyperlink!]!
+  inline: [TopicBusinessInfoBodyResourcesInline!]!
+}
+
+type TopicBusinessInfoBodyResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicBusinessInfoBodyResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicBusinessInfoBodyResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 type TopicBusinessInfoCollection {
@@ -1677,6 +2832,12 @@ type TopicBusinessInfoCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type TopicBusinessInfoCursorCollection {
+  items: [TopicBusinessInfo]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input TopicBusinessInfoFilter {
@@ -1712,8 +2873,44 @@ input TopicBusinessInfoFilter {
 }
 
 type TopicBusinessInfoLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [TopicBusinessInfoLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [TopicBusinessInfoLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum TopicBusinessInfoLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum TopicBusinessInfoLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum TopicBusinessInfoOrder {
@@ -1732,19 +2929,20 @@ enum TopicBusinessInfoOrder {
 }
 
 """
-Container for holding info about people (article authors, company leadership, quoted customers, etc.) [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/topicPerson)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/topicPerson)
 """
-type TopicPerson implements Entry {
-  avatar(locale: String, preview: Boolean): Asset
-  bio(locale: String): TopicPersonBio
-  cardStyle(locale: String): Boolean
+type TopicPerson implements Entry & _Node {
+  _id: ID!
+  avatar(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  bio(locale: String, useFallbackLocale: Boolean): TopicPersonBio
+  cardStyle(locale: String, useFallbackLocale: Boolean): Boolean
   contentfulMetadata: ContentfulMetadata!
-  internalName(locale: String): String
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): TopicPersonLinkingCollections
-  location(locale: String): String
-  name(locale: String): String
+  location(locale: String, useFallbackLocale: Boolean): String
+  name(locale: String, useFallbackLocale: Boolean): String
   sys: Sys!
-  website(locale: String): String
+  website(locale: String, useFallbackLocale: Boolean): String
 }
 
 type TopicPersonBio {
@@ -1766,6 +2964,25 @@ type TopicPersonBioEntries {
 type TopicPersonBioLinks {
   assets: TopicPersonBioAssets!
   entries: TopicPersonBioEntries!
+  resources: TopicPersonBioResources!
+}
+
+type TopicPersonBioResources {
+  block: [TopicPersonBioResourcesBlock!]!
+  hyperlink: [TopicPersonBioResourcesHyperlink!]!
+  inline: [TopicPersonBioResourcesInline!]!
+}
+
+type TopicPersonBioResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicPersonBioResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicPersonBioResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 type TopicPersonCollection {
@@ -1773,6 +2990,12 @@ type TopicPersonCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type TopicPersonCursorCollection {
+  items: [TopicPerson]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input TopicPersonFilter {
@@ -1818,7 +3041,8 @@ input TopicPersonFilter {
 }
 
 type TopicPersonLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
 }
 
 enum TopicPersonOrder {
@@ -1843,17 +3067,19 @@ enum TopicPersonOrder {
 }
 
 """
-Container for product-specific information like card definitions, features, benefits, prices & more [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/topicProduct)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/topicProduct)
 """
-type TopicProduct implements Entry {
+type TopicProduct implements Entry & _Node {
+  _id: ID!
   contentfulMetadata: ContentfulMetadata!
-  description(locale: String): TopicProductDescription
-  featuredImage(locale: String, preview: Boolean): Asset
-  featuresCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): TopicProductFeaturesCollection
-  internalName(locale: String): String
+  description(locale: String, useFallbackLocale: Boolean): TopicProductDescription
+  featuredImage(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
+  featuresCollection(limit: Int = 100, locale: String, order: [TopicProductFeaturesCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean, where: TopicProductFeatureFilter): TopicProductFeaturesCollection
+  featuresCursorCollection(limit: Int = 100, locale: String, order: [TopicProductFeaturesCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean, where: TopicProductFeatureFilter): TopicProductFeaturesCursorCollection
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): TopicProductLinkingCollections
-  name(locale: String): String
-  price(locale: String): Float
+  name(locale: String, useFallbackLocale: Boolean): String
+  price(locale: String, useFallbackLocale: Boolean): Float
   sys: Sys!
 }
 
@@ -1862,6 +3088,12 @@ type TopicProductCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type TopicProductCursorCollection {
+  items: [TopicProduct]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 type TopicProductDescription {
@@ -1883,18 +3115,38 @@ type TopicProductDescriptionEntries {
 type TopicProductDescriptionLinks {
   assets: TopicProductDescriptionAssets!
   entries: TopicProductDescriptionEntries!
+  resources: TopicProductDescriptionResources!
+}
+
+type TopicProductDescriptionResources {
+  block: [TopicProductDescriptionResourcesBlock!]!
+  hyperlink: [TopicProductDescriptionResourcesHyperlink!]!
+  inline: [TopicProductDescriptionResourcesInline!]!
+}
+
+type TopicProductDescriptionResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicProductDescriptionResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicProductDescriptionResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 """
-Sub-container for product features enabling re-use of generic features across different products [See type definition](https://app.contentful.com/spaces/c586i03gpxi9/content_types/topicProductFeature)
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/topicProductFeature)
 """
-type TopicProductFeature implements Entry {
+type TopicProductFeature implements Entry & _Node {
+  _id: ID!
   contentfulMetadata: ContentfulMetadata!
-  internalName(locale: String): String
+  internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): TopicProductFeatureLinkingCollections
-  longDescription(locale: String): TopicProductFeatureLongDescription
-  name(locale: String): String
-  shortDescription(locale: String): TopicProductFeatureShortDescription
+  longDescription(locale: String, useFallbackLocale: Boolean): TopicProductFeatureLongDescription
+  name(locale: String, useFallbackLocale: Boolean): String
+  shortDescription(locale: String, useFallbackLocale: Boolean): TopicProductFeatureShortDescription
   sys: Sys!
 }
 
@@ -1903,6 +3155,12 @@ type TopicProductFeatureCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+type TopicProductFeatureCursorCollection {
+  items: [TopicProductFeature]!
+  limit: Int!
+  pages: CursorPages!
 }
 
 input TopicProductFeatureFilter {
@@ -1933,8 +3191,44 @@ input TopicProductFeatureFilter {
 }
 
 type TopicProductFeatureLinkingCollections {
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  topicProductCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): TopicProductCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  topicProductCollection(limit: Int = 100, locale: String, order: [TopicProductFeatureLinkingCollectionsTopicProductCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): TopicProductCollection
+  topicProductCursorCollection(limit: Int = 100, locale: String, order: [TopicProductFeatureLinkingCollectionsTopicProductCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): TopicProductCursorCollection
+}
+
+enum TopicProductFeatureLinkingCollectionsTopicProductCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  name_ASC
+  name_DESC
+  price_ASC
+  price_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum TopicProductFeatureLinkingCollectionsTopicProductCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  name_ASC
+  name_DESC
+  price_ASC
+  price_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 type TopicProductFeatureLongDescription {
@@ -1956,6 +3250,25 @@ type TopicProductFeatureLongDescriptionEntries {
 type TopicProductFeatureLongDescriptionLinks {
   assets: TopicProductFeatureLongDescriptionAssets!
   entries: TopicProductFeatureLongDescriptionEntries!
+  resources: TopicProductFeatureLongDescriptionResources!
+}
+
+type TopicProductFeatureLongDescriptionResources {
+  block: [TopicProductFeatureLongDescriptionResourcesBlock!]!
+  hyperlink: [TopicProductFeatureLongDescriptionResourcesHyperlink!]!
+  inline: [TopicProductFeatureLongDescriptionResourcesInline!]!
+}
+
+type TopicProductFeatureLongDescriptionResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicProductFeatureLongDescriptionResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicProductFeatureLongDescriptionResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 enum TopicProductFeatureOrder {
@@ -1992,6 +3305,25 @@ type TopicProductFeatureShortDescriptionEntries {
 type TopicProductFeatureShortDescriptionLinks {
   assets: TopicProductFeatureShortDescriptionAssets!
   entries: TopicProductFeatureShortDescriptionEntries!
+  resources: TopicProductFeatureShortDescriptionResources!
+}
+
+type TopicProductFeatureShortDescriptionResources {
+  block: [TopicProductFeatureShortDescriptionResourcesBlock!]!
+  hyperlink: [TopicProductFeatureShortDescriptionResourcesHyperlink!]!
+  inline: [TopicProductFeatureShortDescriptionResourcesInline!]!
+}
+
+type TopicProductFeatureShortDescriptionResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicProductFeatureShortDescriptionResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type TopicProductFeatureShortDescriptionResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 type TopicProductFeaturesCollection {
@@ -1999,6 +3331,42 @@ type TopicProductFeaturesCollection {
   limit: Int!
   skip: Int!
   total: Int!
+}
+
+enum TopicProductFeaturesCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  name_ASC
+  name_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+type TopicProductFeaturesCursorCollection {
+  items: [TopicProductFeature]!
+  limit: Int!
+  pages: CursorPages!
+}
+
+enum TopicProductFeaturesCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  name_ASC
+  name_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 input TopicProductFilter {
@@ -2038,9 +3406,80 @@ input TopicProductFilter {
 }
 
 type TopicProductLinkingCollections {
-  componentProductTableCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): ComponentProductTableCollection
-  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): EntryCollection
-  pageCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0): PageCollection
+  componentProductTableCollection(limit: Int = 100, locale: String, order: [TopicProductLinkingCollectionsComponentProductTableCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentProductTableCollection
+  componentProductTableCursorCollection(limit: Int = 100, locale: String, order: [TopicProductLinkingCollectionsComponentProductTableCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentProductTableCursorCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [TopicProductLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [TopicProductLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum TopicProductLinkingCollectionsComponentProductTableCollectionOrder {
+  headline_ASC
+  headline_DESC
+  internalName_ASC
+  internalName_DESC
+  subline_ASC
+  subline_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum TopicProductLinkingCollectionsComponentProductTableCursorCollectionOrder {
+  headline_ASC
+  headline_DESC
+  internalName_ASC
+  internalName_DESC
+  subline_ASC
+  subline_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum TopicProductLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum TopicProductLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
 }
 
 enum TopicProductOrder {
@@ -2058,6 +3497,162 @@ enum TopicProductOrder {
   sys_publishedAt_DESC
   sys_publishedVersion_ASC
   sys_publishedVersion_DESC
+}
+
+"""
+[See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/variantContainer)
+"""
+type VariantContainer implements Entry & _Node {
+  _id: ID!
+  contentfulMetadata: ContentfulMetadata!
+  experiment(locale: String, useFallbackLocale: Boolean): JSON
+  experimentId(locale: String, useFallbackLocale: Boolean): String
+  linkedFrom(allowedLocales: [String]): VariantContainerLinkingCollections
+  meta(locale: String, useFallbackLocale: Boolean): JSON
+  sys: Sys!
+  variantsCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): VariantContainerVariantsCollection
+  variantsCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): VariantContainerVariantsCursorCollection
+}
+
+type VariantContainerCollection {
+  items: [VariantContainer]!
+  limit: Int!
+  skip: Int!
+  total: Int!
+}
+
+type VariantContainerCursorCollection {
+  items: [VariantContainer]!
+  limit: Int!
+  pages: CursorPages!
+}
+
+input VariantContainerFilter {
+  AND: [VariantContainerFilter]
+  OR: [VariantContainerFilter]
+  contentfulMetadata: ContentfulMetadataFilter
+  experimentId: String
+  experimentId_contains: String
+  experimentId_exists: Boolean
+  experimentId_in: [String]
+  experimentId_not: String
+  experimentId_not_contains: String
+  experimentId_not_in: [String]
+  experiment_exists: Boolean
+  meta_exists: Boolean
+  sys: SysFilter
+  variantsCollection_exists: Boolean
+}
+
+type VariantContainerLinkingCollections {
+  componentInfoBlockCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsComponentInfoBlockCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentInfoBlockCollection
+  componentInfoBlockCursorCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsComponentInfoBlockCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentInfoBlockCursorCollection
+  entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
+  entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  pageCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
+  pageCursorCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum VariantContainerLinkingCollectionsComponentInfoBlockCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  headline_ASC
+  headline_DESC
+  internalName_ASC
+  internalName_DESC
+  subline_ASC
+  subline_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum VariantContainerLinkingCollectionsComponentInfoBlockCursorCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  headline_ASC
+  headline_DESC
+  internalName_ASC
+  internalName_DESC
+  subline_ASC
+  subline_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum VariantContainerLinkingCollectionsPageCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum VariantContainerLinkingCollectionsPageCursorCollectionOrder {
+  internalName_ASC
+  internalName_DESC
+  pageName_ASC
+  pageName_DESC
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+enum VariantContainerOrder {
+  experimentId_ASC
+  experimentId_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+}
+
+type VariantContainerVariantsCollection {
+  items: [Entry]!
+  limit: Int!
+  skip: Int!
+  total: Int!
+}
+
+type VariantContainerVariantsCursorCollection {
+  items: [Entry]!
+  limit: Int!
+  pages: CursorPages!
+}
+
+interface _Node {
+  _id: ID!
 }
 
 input cfMenuGroupNestedFilter {
@@ -2177,5 +3772,130 @@ input cfTopicProductNestedFilter {
   price_lte: Float
   price_not: Float
   price_not_in: [Float]
+  sys: SysFilter
+}
+
+input cfVariantContainerNestedFilter {
+  AND: [cfVariantContainerNestedFilter]
+  OR: [cfVariantContainerNestedFilter]
+  contentfulMetadata: ContentfulMetadataFilter
+  experimentId: String
+  experimentId_contains: String
+  experimentId_exists: Boolean
+  experimentId_in: [String]
+  experimentId_not: String
+  experimentId_not_contains: String
+  experimentId_not_in: [String]
+  experiment_exists: Boolean
+  meta_exists: Boolean
+  sys: SysFilter
+  variantsCollection_exists: Boolean
+}
+
+input cfextraSectionMultiTypeNestedFilter {
+  AND: [cfextraSectionMultiTypeNestedFilter]
+  OR: [cfextraSectionMultiTypeNestedFilter]
+  colorPalette: String
+  colorPalette_contains: String
+  colorPalette_exists: Boolean
+  colorPalette_in: [String]
+  colorPalette_not: String
+  colorPalette_not_contains: String
+  colorPalette_not_in: [String]
+  contentfulMetadata: ContentfulMetadataFilter
+  internalName: String
+  internalName_contains: String
+  internalName_exists: Boolean
+  internalName_in: [String]
+  internalName_not: String
+  internalName_not_contains: String
+  internalName_not_in: [String]
+  sys: SysFilter
+}
+
+input cffeaturedPagesMultiTypeNestedFilter {
+  AND: [cffeaturedPagesMultiTypeNestedFilter]
+  OR: [cffeaturedPagesMultiTypeNestedFilter]
+  blackCardCtaText_exists: Boolean
+  contentfulMetadata: ContentfulMetadataFilter
+  extraSectionCollection_exists: Boolean
+  internalName: String
+  internalName_contains: String
+  internalName_exists: Boolean
+  internalName_in: [String]
+  internalName_not: String
+  internalName_not_contains: String
+  internalName_not_in: [String]
+  pageContent_exists: Boolean
+  pageName: String
+  pageName_contains: String
+  pageName_exists: Boolean
+  pageName_in: [String]
+  pageName_not: String
+  pageName_not_contains: String
+  pageName_not_in: [String]
+  seo_exists: Boolean
+  slug: String
+  slug_contains: String
+  slug_exists: Boolean
+  slug_in: [String]
+  slug_not: String
+  slug_not_contains: String
+  slug_not_in: [String]
+  sys: SysFilter
+  topSectionCollection_exists: Boolean
+}
+
+input cfgroupLinkMultiTypeNestedFilter {
+  AND: [cfgroupLinkMultiTypeNestedFilter]
+  OR: [cfgroupLinkMultiTypeNestedFilter]
+  blackCardCtaText_exists: Boolean
+  contentfulMetadata: ContentfulMetadataFilter
+  extraSectionCollection_exists: Boolean
+  internalName: String
+  internalName_contains: String
+  internalName_exists: Boolean
+  internalName_in: [String]
+  internalName_not: String
+  internalName_not_contains: String
+  internalName_not_in: [String]
+  pageContent_exists: Boolean
+  pageName: String
+  pageName_contains: String
+  pageName_exists: Boolean
+  pageName_in: [String]
+  pageName_not: String
+  pageName_not_contains: String
+  pageName_not_in: [String]
+  seo_exists: Boolean
+  slug: String
+  slug_contains: String
+  slug_exists: Boolean
+  slug_in: [String]
+  slug_not: String
+  slug_not_contains: String
+  slug_not_in: [String]
+  sys: SysFilter
+  topSectionCollection_exists: Boolean
+}
+
+input cftopSectionMultiTypeNestedFilter {
+  AND: [cftopSectionMultiTypeNestedFilter]
+  OR: [cftopSectionMultiTypeNestedFilter]
+  colorPalette: String
+  colorPalette_contains: String
+  colorPalette_exists: Boolean
+  colorPalette_in: [String]
+  colorPalette_not: String
+  colorPalette_not_contains: String
+  colorPalette_not_in: [String]
+  contentfulMetadata: ContentfulMetadataFilter
+  internalName: String
+  internalName_contains: String
+  internalName_exists: Boolean
+  internalName_in: [String]
+  internalName_not: String
+  internalName_not_contains: String
+  internalName_not_in: [String]
   sys: SysFilter
 }

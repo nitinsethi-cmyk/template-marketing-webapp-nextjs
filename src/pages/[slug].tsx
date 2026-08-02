@@ -54,12 +54,14 @@ export const getServerSideProps = async ({ locale, params, query }: CustomNextPa
     const topSection = page?.topSectionCollection?.items;
     const extraSection = page?.extraSectionCollection?.items;
     const content: ComponentReferenceFieldsFragment | undefined | null = page?.pageContent;
+    const experimentVariants = page?.blackCardCtaText?.variantsCollection?.items ?? [];
 
     await Promise.all([
       ...prefetchPromises,
       ...prefetchPromiseArr({ inputArr: topSection, locale, queryClient }),
       ...prefetchPromiseArr({ inputArr: extraSection, locale, queryClient }),
       ...prefetchPromiseArr({ inputArr: [content], locale, queryClient }),
+      ...prefetchPromiseArr({ inputArr: experimentVariants, locale, queryClient }),
     ]);
 
     if (content) {

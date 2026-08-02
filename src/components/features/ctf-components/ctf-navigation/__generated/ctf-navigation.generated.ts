@@ -15,8 +15,8 @@ export type NavigationFieldsFragment = { __typename?: 'NavigationMenuCollection'
         ) | null } | null> } | null } | null> };
 
 export type CtfNavigationQueryVariables = Types.Exact<{
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -24,6 +24,7 @@ export type CtfNavigationQuery = { __typename?: 'Query', navigationMenuCollectio
     { __typename?: 'NavigationMenuCollection' }
     & NavigationFieldsFragment
   ) | null };
+
 
 export const NavigationFieldsFragmentDoc = `
     fragment NavigationFields on NavigationMenuCollection {
@@ -55,20 +56,22 @@ export const CtfNavigationDocument = `
     ${NavigationFieldsFragmentDoc}
 ${PageLinkFieldsFragmentDoc}
 ${MenuGroupFieldsFragmentDoc}`;
+
 export const useCtfNavigationQuery = <
       TData = CtfNavigationQuery,
       TError = unknown
     >(
       variables?: CtfNavigationQueryVariables,
       options?: UseQueryOptions<CtfNavigationQuery, TError, TData>
-    ) =>
-    useQuery<CtfNavigationQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfNavigationQuery, TError, TData>(
       variables === undefined ? ['CtfNavigation'] : ['CtfNavigation', variables],
       customFetcher<CtfNavigationQuery, CtfNavigationQueryVariables>(CtfNavigationDocument, variables),
       options
-    );
+    )};
 
 useCtfNavigationQuery.getKey = (variables?: CtfNavigationQueryVariables) => variables === undefined ? ['CtfNavigation'] : ['CtfNavigation', variables];
-;
+
 
 useCtfNavigationQuery.fetcher = (variables?: CtfNavigationQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfNavigationQuery, CtfNavigationQueryVariables>(CtfNavigationDocument, variables, options);

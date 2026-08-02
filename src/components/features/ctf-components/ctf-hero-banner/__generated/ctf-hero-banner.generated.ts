@@ -15,9 +15,9 @@ export type HeroBannerFieldsFragment = { __typename: 'ComponentHeroBanner', head
   ) | null };
 
 export type CtfHeroBannerQueryVariables = Types.Exact<{
-  id: Types.Scalars['String'];
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  id: Types.Scalars['String']['input'];
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -25,6 +25,7 @@ export type CtfHeroBannerQuery = { __typename?: 'Query', componentHeroBanner?: (
     { __typename?: 'ComponentHeroBanner' }
     & HeroBannerFieldsFragment
   ) | null };
+
 
 export const HeroBannerFieldsFragmentDoc = `
     fragment HeroBannerFields on ComponentHeroBanner {
@@ -57,20 +58,22 @@ export const CtfHeroBannerDocument = `
     ${HeroBannerFieldsFragmentDoc}
 ${PageLinkFieldsFragmentDoc}
 ${AssetFieldsFragmentDoc}`;
+
 export const useCtfHeroBannerQuery = <
       TData = CtfHeroBannerQuery,
       TError = unknown
     >(
       variables: CtfHeroBannerQueryVariables,
       options?: UseQueryOptions<CtfHeroBannerQuery, TError, TData>
-    ) =>
-    useQuery<CtfHeroBannerQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfHeroBannerQuery, TError, TData>(
       ['CtfHeroBanner', variables],
       customFetcher<CtfHeroBannerQuery, CtfHeroBannerQueryVariables>(CtfHeroBannerDocument, variables),
       options
-    );
+    )};
 
 useCtfHeroBannerQuery.getKey = (variables: CtfHeroBannerQueryVariables) => ['CtfHeroBanner', variables];
-;
+
 
 useCtfHeroBannerQuery.fetcher = (variables: CtfHeroBannerQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfHeroBannerQuery, CtfHeroBannerQueryVariables>(CtfHeroBannerDocument, variables, options);

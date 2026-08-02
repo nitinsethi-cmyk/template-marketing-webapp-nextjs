@@ -10,6 +10,27 @@ fragment PageExtraSectionItemFields on PageExtraSectionItem {
   __typename
 }
 
+# Amplitude Contentful Variant Container
+# @see https://amplitude.com/docs/feature-experiment/contentful
+fragment VariantContainerFields on VariantContainer {
+  __typename
+  sys {
+    id
+  }
+  experimentId
+  meta
+  experiment
+  variantsCollection(limit: 20) {
+    items {
+      __typename
+      ... on Entry {
+        sys {
+          id
+        }
+      }
+    }
+  }
+}
 
 fragment CtfPageFields on Page {
   __typename
@@ -47,6 +68,10 @@ fragment CtfPageFields on Page {
       }
     }
     ...PageContentFields
+  }
+  # Contentful field holding the Amplitude VariantContainer for finance-hp on /black-card
+  blackCardCtaText {
+    ...VariantContainerFields
   }
   extraSectionCollection(limit: 20) {
     items {

@@ -13,9 +13,9 @@ export type ProductFeatureFieldsFragment = { __typename: 'TopicProductFeature', 
         ) | null> } } } | null };
 
 export type CtfProductFeatureQueryVariables = Types.Exact<{
-  id: Types.Scalars['String'];
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  id: Types.Scalars['String']['input'];
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -23,6 +23,7 @@ export type CtfProductFeatureQuery = { __typename?: 'Query', topicProductFeature
     { __typename?: 'TopicProductFeature' }
     & ProductFeatureFieldsFragment
   ) | null };
+
 
 export const ProductFeatureFieldsFragmentDoc = `
     fragment ProductFeatureFields on TopicProductFeature {
@@ -61,20 +62,22 @@ export const CtfProductFeatureDocument = `
 }
     ${ProductFeatureFieldsFragmentDoc}
 ${AssetFieldsFragmentDoc}`;
+
 export const useCtfProductFeatureQuery = <
       TData = CtfProductFeatureQuery,
       TError = unknown
     >(
       variables: CtfProductFeatureQueryVariables,
       options?: UseQueryOptions<CtfProductFeatureQuery, TError, TData>
-    ) =>
-    useQuery<CtfProductFeatureQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfProductFeatureQuery, TError, TData>(
       ['CtfProductFeature', variables],
       customFetcher<CtfProductFeatureQuery, CtfProductFeatureQueryVariables>(CtfProductFeatureDocument, variables),
       options
-    );
+    )};
 
 useCtfProductFeatureQuery.getKey = (variables: CtfProductFeatureQueryVariables) => ['CtfProductFeature', variables];
-;
+
 
 useCtfProductFeatureQuery.fetcher = (variables: CtfProductFeatureQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfProductFeatureQuery, CtfProductFeatureQueryVariables>(CtfProductFeatureDocument, variables, options);

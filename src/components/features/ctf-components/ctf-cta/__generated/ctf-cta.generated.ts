@@ -10,9 +10,9 @@ export type CtaFieldsFragment = { __typename: 'ComponentCta', headline?: string 
   ) | null };
 
 export type CtfCtaQueryVariables = Types.Exact<{
-  id: Types.Scalars['String'];
-  locale?: Types.InputMaybe<Types.Scalars['String']>;
-  preview?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  id: Types.Scalars['String']['input'];
+  locale?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  preview?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
 
@@ -20,6 +20,7 @@ export type CtfCtaQuery = { __typename?: 'Query', componentCta?: (
     { __typename?: 'ComponentCta' }
     & CtaFieldsFragment
   ) | null };
+
 
 export const CtaFieldsFragmentDoc = `
     fragment CtaFields on ComponentCta {
@@ -47,20 +48,22 @@ export const CtfCtaDocument = `
 }
     ${CtaFieldsFragmentDoc}
 ${PageLinkFieldsFragmentDoc}`;
+
 export const useCtfCtaQuery = <
       TData = CtfCtaQuery,
       TError = unknown
     >(
       variables: CtfCtaQueryVariables,
       options?: UseQueryOptions<CtfCtaQuery, TError, TData>
-    ) =>
-    useQuery<CtfCtaQuery, TError, TData>(
+    ) => {
+    
+    return useQuery<CtfCtaQuery, TError, TData>(
       ['CtfCta', variables],
       customFetcher<CtfCtaQuery, CtfCtaQueryVariables>(CtfCtaDocument, variables),
       options
-    );
+    )};
 
 useCtfCtaQuery.getKey = (variables: CtfCtaQueryVariables) => ['CtfCta', variables];
-;
+
 
 useCtfCtaQuery.fetcher = (variables: CtfCtaQueryVariables, options?: RequestInit['headers']) => customFetcher<CtfCtaQuery, CtfCtaQueryVariables>(CtfCtaDocument, variables, options);
