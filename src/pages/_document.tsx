@@ -29,19 +29,33 @@ export default class CustomDocument extends Document {
           <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
           <link rel="manifest" href="/site.webmanifest" />
 
-          <script src="https://cdn.amplitude.com/script/13763c810e8e420a211a47efe6d52a1a.js" />
+          {/* Browser SDK 2.0 */}
+          <script src="https://cdn.amplitude.com/libs/analytics-browser-2.45.4-min.js.gz" />
+          {/* Session Replay plugin */}
+          <script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.33.6-min.js.gz" />
           <script
             dangerouslySetInnerHTML={{
               __html: `
+                window.amplitude.add(window.sessionReplay.plugin({
+                  sampleRate: 0.1,
+                  forceSessionTracking: true,
+                }));
                 window.amplitude.init("13763c810e8e420a211a47efe6d52a1a", {
-                  defaultTracking: true,
-                  autocapture: true,
                   fetchRemoteConfig: true,
+                  autocapture: {
+                    attribution: true,
+                    pageViews: true,
+                    sessions: true,
+                    formInteractions: true,
+                    fileDownloads: true,
+                    elementInteractions: true,
+                  },
                 });
-                window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
               `,
             }}
           />
+          {/* Web Experiment */}
+          <script src="https://cdn.amplitude.com/script/13763c810e8e420a211a47efe6d52a1a.experiment.js" />
         </Head>
         <body>
           <Main />
