@@ -1,15 +1,15 @@
 import { Variant } from '@amplitude/experiment-js-client';
 
-type ContentfulEntryRef = {
+export type ContentfulEntryRef = {
   __typename?: string | null;
   sys: { id: string };
-} | null;
+};
 
 type VariantContainerLike = {
   experimentId?: string | null;
   meta?: unknown;
   variantsCollection?: {
-    items?: Array<ContentfulEntryRef>;
+    items?: Array<ContentfulEntryRef | null>;
   } | null;
 } | null;
 
@@ -19,11 +19,11 @@ type VariantContainerLike = {
  *
  * @see https://amplitude.com/docs/feature-experiment/contentful
  */
-export function resolveContentfulVariation<T extends ContentfulEntryRef>(
+export function resolveContentfulVariation(
   container: VariantContainerLike,
   amplitudeVariant: Variant | undefined,
-  fallback: T,
-): T {
+  fallback: ContentfulEntryRef | null = null,
+): ContentfulEntryRef | null {
   if (!container?.experimentId) {
     return fallback;
   }
@@ -36,11 +36,11 @@ export function resolveContentfulVariation<T extends ContentfulEntryRef>(
 
   const variationId = meta?.[variantKey];
   if (!variationId) {
-    // Control (or unmapped variant): keep the page's default Contentful entry.
+    // Control (or unmapped variant): keep the provided fallback entry.
     return fallback;
   }
 
   const match = container.variantsCollection?.items?.find(item => item?.sys?.id === variationId);
 
-  return (match as T) ?? fallback;
+  return match ?? fallback;
 }

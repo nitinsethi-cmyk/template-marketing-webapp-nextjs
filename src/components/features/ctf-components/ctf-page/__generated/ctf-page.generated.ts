@@ -122,6 +122,9 @@ export type CtfPageFieldsFragment = { __typename: 'Page', pageName?: string | nu
    | null, blackCardCtaText?: (
     { __typename?: 'VariantContainer' }
     & VariantContainerFieldsFragment
+  ) | null, testSlot2?: (
+    { __typename?: 'VariantContainer' }
+    & VariantContainerFieldsFragment
   ) | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
       | (
         { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
@@ -237,6 +240,9 @@ export const CtfPageFieldsFragmentDoc = `
     ...PageContentFields
   }
   blackCardCtaText {
+    ...VariantContainerFields
+  }
+  testSlot2 {
     ...VariantContainerFields
   }
   extraSectionCollection(limit: 20) {

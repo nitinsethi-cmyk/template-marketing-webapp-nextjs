@@ -12,21 +12,38 @@ const CtfPage = (props: CtfPageFieldsFragment) => {
   const extraSection =
     props.extraSectionCollection && props.extraSectionCollection.items.filter(it => !!it);
 
-  const experimentContainer = props.blackCardCtaText;
-  const experimentId = experimentContainer?.experimentId ?? '';
-  const amplitudeVariant = useVariant(experimentId || 'off', 'control', {
-    track: Boolean(experimentId),
+  // Experiment 1: finance-hp (blackCardCtaText) → swaps pageContent
+  const primaryContainer = props.blackCardCtaText;
+  const primaryExperimentId = primaryContainer?.experimentId ?? '';
+  const primaryVariant = useVariant(primaryExperimentId || 'off', 'control', {
+    track: Boolean(primaryExperimentId),
   });
-
   const content = useMemo(
     () =>
       resolveContentfulVariation(
-        experimentContainer ?? null,
-        amplitudeVariant,
+        primaryContainer ?? null,
+        primaryVariant,
         props.pageContent ?? null,
       ),
-    [amplitudeVariant, experimentContainer, props.pageContent],
+    [primaryVariant, primaryContainer, props.pageContent],
   );
+
+  // Experiment 2: finance-existing-customer (testSlot2) → independent content slot
+  const slot2Container = props.testSlot2;
+  const slot2ExperimentId = slot2Container?.experimentId ?? '';
+  const slot2Variant = useVariant(slot2ExperimentId || 'off', 'control', {
+    track: Boolean(slot2ExperimentId),
+  });
+  const slot2Content = useMemo(() => {
+    const resolved = resolveContentfulVariation(slot2Container ?? null, slot2Variant, null);
+    if (!resolved?.__typename || !resolved.sys?.id) {
+      return null;
+    }
+    return {
+      __typename: resolved.__typename,
+      sys: { id: resolved.sys.id },
+    };
+  }, [slot2Container, slot2Variant]);
 
   const layoutConfig = {
     ...defaultLayout,
@@ -42,9 +59,20 @@ const CtfPage = (props: CtfPageFieldsFragment) => {
           </LayoutContext.Provider>
         ))}
 
-      {content && (
+      {content?.__typename && content.sys?.id && (
         <LayoutContext.Provider value={defaultLayout} key={content.sys.id}>
-          <ComponentResolver componentProps={content} />
+          <ComponentResolver
+            componentProps={{
+              __typename: content.__typename,
+              sys: { id: content.sys.id },
+            }}
+          />
+        </LayoutContext.Provider>
+      )}
+
+      {slot2Content && (
+        <LayoutContext.Provider value={defaultLayout} key={`slot2-${slot2Content.sys.id}`}>
+          <ComponentResolver componentProps={slot2Content} />
         </LayoutContext.Provider>
       )}
 

@@ -73,6 +73,10 @@ fragment CtfPageFields on Page {
   blackCardCtaText {
     ...VariantContainerFields
   }
+  # Second independent experiment slot (finance-existing-customer)
+  testSlot2 {
+    ...VariantContainerFields
+  }
   extraSectionCollection(limit: 20) {
     items {
       ... on Entry {
