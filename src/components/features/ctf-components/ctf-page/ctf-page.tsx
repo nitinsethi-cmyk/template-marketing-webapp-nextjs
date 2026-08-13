@@ -6,13 +6,41 @@ import { PageContainer } from '@src/components/templates/page-container';
 import LayoutContext, { defaultLayout } from '@src/layout-context';
 import { resolveContentfulVariation, useVariant } from '@src/lib/experiment';
 
+type SectionEntry = {
+  __typename?: string | null;
+  sys: { id: string };
+} | null;
+
+function withReplacedCta(
+  items: SectionEntry[] | null | undefined,
+  resolvedCta: SectionEntry,
+  experimentConfigured: boolean,
+) {
+  if (!items) {
+    return null;
+  }
+
+  return items.map(entry => {
+    if (!entry || entry.__typename !== 'ComponentCta') {
+      return entry;
+    }
+    if (!experimentConfigured || !resolvedCta?.__typename || !resolvedCta.sys?.id) {
+      return entry;
+    }
+    return {
+      __typename: resolvedCta.__typename,
+      sys: { id: resolvedCta.sys.id },
+    };
+  });
+}
+
 const CtfPage = (props: CtfPageFieldsFragment) => {
   const topSection =
     props.topSectionCollection && props.topSectionCollection.items.filter(it => !!it);
   const extraSection =
     props.extraSectionCollection && props.extraSectionCollection.items.filter(it => !!it);
 
-  // Experiment 1: finance-hp (blackCardCtaText) → swaps pageContent
+  // Experiment 1: finance-hp (blackCardCtaText) → replaces pageContent
   const primaryContainer = props.blackCardCtaText;
   const primaryExperimentId = primaryContainer?.experimentId ?? '';
   const primaryVariant = useVariant(primaryExperimentId || 'off', 'control', {
@@ -28,22 +56,43 @@ const CtfPage = (props: CtfPageFieldsFragment) => {
     [primaryVariant, primaryContainer, props.pageContent],
   );
 
-  // Experiment 2: finance-existing-customer (testSlot2) → independent content slot
+  // Experiment 2: finance-existing-customer (testSlot2) → replaces existing ComponentCta
   const slot2Container = props.testSlot2;
   const slot2ExperimentId = slot2Container?.experimentId ?? '';
   const slot2Variant = useVariant(slot2ExperimentId || 'off', 'control', {
     track: Boolean(slot2ExperimentId),
   });
-  const slot2Content = useMemo(() => {
-    const resolved = resolveContentfulVariation(slot2Container ?? null, slot2Variant, null);
-    if (!resolved?.__typename || !resolved.sys?.id) {
-      return null;
-    }
-    return {
-      __typename: resolved.__typename,
-      sys: { id: resolved.sys.id },
-    };
-  }, [slot2Container, slot2Variant]);
+
+  const defaultCta =
+    (topSection?.find(item => item?.__typename === 'ComponentCta') as SectionEntry | undefined) ??
+    (extraSection?.find(item => item?.__typename === 'ComponentCta') as SectionEntry | undefined) ??
+    null;
+
+  const resolvedCta = useMemo(
+    () =>
+      resolveContentfulVariation(
+        slot2Container ?? null,
+        slot2Variant,
+        defaultCta ? { __typename: defaultCta.__typename, sys: { id: defaultCta.sys.id } } : null,
+      ),
+    [defaultCta, slot2Container, slot2Variant],
+  );
+
+  const resolvedTopSection = useMemo(
+    () =>
+      withReplacedCta(topSection as SectionEntry[] | null, resolvedCta, Boolean(slot2ExperimentId)),
+    [topSection, resolvedCta, slot2ExperimentId],
+  );
+
+  const resolvedExtraSection = useMemo(
+    () =>
+      withReplacedCta(
+        extraSection as SectionEntry[] | null,
+        resolvedCta,
+        Boolean(slot2ExperimentId),
+      ),
+    [extraSection, resolvedCta, slot2ExperimentId],
+  );
 
   const layoutConfig = {
     ...defaultLayout,
@@ -52,10 +101,10 @@ const CtfPage = (props: CtfPageFieldsFragment) => {
 
   return (
     <PageContainer>
-      {topSection &&
-        topSection.map(entry => (
+      {resolvedTopSection &&
+        resolvedTopSection.map(entry => (
           <LayoutContext.Provider value={layoutConfig} key={entry!.sys.id}>
-            <ComponentResolver componentProps={entry!} />
+            <ComponentResolver componentProps={entry as any} />
           </LayoutContext.Provider>
         ))}
 
@@ -70,16 +119,10 @@ const CtfPage = (props: CtfPageFieldsFragment) => {
         </LayoutContext.Provider>
       )}
 
-      {slot2Content && (
-        <LayoutContext.Provider value={defaultLayout} key={`slot2-${slot2Content.sys.id}`}>
-          <ComponentResolver componentProps={slot2Content} />
-        </LayoutContext.Provider>
-      )}
-
-      {extraSection &&
-        extraSection.map(entry => (
+      {resolvedExtraSection &&
+        resolvedExtraSection.map(entry => (
           <LayoutContext.Provider value={layoutConfig} key={entry!.sys.id}>
-            <ComponentResolver componentProps={entry!} />
+            <ComponentResolver componentProps={entry as any} />
           </LayoutContext.Provider>
         ))}
     </PageContainer>
