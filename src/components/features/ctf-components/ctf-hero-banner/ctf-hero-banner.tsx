@@ -9,7 +9,12 @@ import { HeroBannerFieldsFragment } from './__generated/ctf-hero-banner.generate
 import { CtfRichtext } from '@src/components/features/ctf-components/ctf-richtext/ctf-richtext';
 import { PageLink } from '@src/components/features/page-link';
 import LayoutContext, { defaultLayout, useLayoutContext } from '@src/layout-context';
+import { useVariant } from '@src/lib/experiment';
 import { getColorConfigFromPalette, HEADER_HEIGHT_MD, HEADER_HEIGHT } from '@src/theme';
+
+const HP_WELCOME_CONTROL_HEADLINE =
+  'We wanted banking to be simple. So we rebuilt it from the ground up';
+const HP_WELCOME_TREATMENT_HEADLINE = 'Welcome. This is the new copy';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -124,6 +129,13 @@ export const CtfHeroBanner = (props: HeroBannerFieldsFragment) => {
   const classes = useStyles();
   const inspectorMode = useContentfulInspectorMode({ entryId: id });
 
+  // Homepage headline experiment (client-side). Only swaps the known control copy.
+  const hpWelcome = useVariant('hp-welcome', 'control');
+  const displayHeadline =
+    hpWelcome.value === 'treatment' && headline === HP_WELCOME_CONTROL_HEADLINE
+      ? HP_WELCOME_TREATMENT_HEADLINE
+      : headline;
+
   return (
     <Container
       maxWidth={false}
@@ -153,14 +165,14 @@ export const CtfHeroBanner = (props: HeroBannerFieldsFragment) => {
           </Typography>
         )}
         */}
-        {headline && (
+        {displayHeadline && (
           <Typography
             variant="h1"
             className={classes.headline}
             style={{ color: colorConfig.headlineColor }}
             {...inspectorMode({ fieldId: 'headline' })}
           >
-            {headline}
+            {displayHeadline}
           </Typography>
         )}
         {bodyText && (
