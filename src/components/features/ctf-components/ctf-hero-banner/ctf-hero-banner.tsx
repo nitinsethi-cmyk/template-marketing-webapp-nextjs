@@ -16,6 +16,13 @@ const HP_WELCOME_CONTROL_HEADLINE =
   'We wanted banking to be simple. So we rebuilt it from the ground up';
 const HP_WELCOME_TREATMENT_HEADLINE = 'Welcome. This is the new copy';
 
+// Contentful copy may differ in trailing punctuation/whitespace from the constant above.
+const normalizeHeadline = (value: string) =>
+  value
+    .trim()
+    .replace(/[.!?\s]+$/, '')
+    .toLowerCase();
+
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     alignItems: 'center',
@@ -131,10 +138,10 @@ export const CtfHeroBanner = (props: HeroBannerFieldsFragment) => {
 
   // Homepage headline experiment (client-side). Only swaps the known control copy.
   const hpWelcome = useVariant('hp-welcome', 'control');
+  const isControlHeadline =
+    !!headline && normalizeHeadline(headline) === normalizeHeadline(HP_WELCOME_CONTROL_HEADLINE);
   const displayHeadline =
-    hpWelcome.value === 'treatment' && headline === HP_WELCOME_CONTROL_HEADLINE
-      ? HP_WELCOME_TREATMENT_HEADLINE
-      : headline;
+    hpWelcome.value === 'treatment' && isControlHeadline ? HP_WELCOME_TREATMENT_HEADLINE : headline;
 
   return (
     <Container
