@@ -36,6 +36,7 @@
   "license": "MIT",
   "dependencies": {
     "@amplitude/experiment-js-client": "^1.21.4",
+    "@amplitude/experiment-node-server": "^1.13.6",
     "@contentful/live-preview": "4.9.0",
     "@contentful/rich-text-react-renderer": "16.1.6",
     "@contentful/rich-text-types": "17.2.5",

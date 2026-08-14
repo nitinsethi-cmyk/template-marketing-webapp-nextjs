@@ -9,7 +9,9 @@ import {
   useState,
 } from 'react';
 
-import { fetchExperimentVariants, getExperimentClient, getVariant } from './client';
+import { createExperimentClient, fetchExperimentVariants, getVariant } from './client';
+
+const EMPTY_VARIANTS: Record<string, Variant> = {};
 
 export interface ExperimentContextValue {
   client: ExperimentClient | null;
@@ -25,26 +27,50 @@ const ExperimentContext = createContext<ExperimentContextValue>({
   exposure: () => undefined,
 });
 
-export function ExperimentProvider({ children }: { children: ReactNode }) {
-  const [client, setClient] = useState<ExperimentClient | null>(null);
-  const [ready, setReady] = useState(false);
+export function ExperimentProvider({
+  children,
+  initialVariants = EMPTY_VARIANTS,
+}: {
+  children: ReactNode;
+  initialVariants?: Record<string, Variant>;
+}) {
+  const hasSSRVariants = Object.keys(initialVariants).length > 0;
+
+  // Synchronous bootstrap so SSR HTML and client hydration agree (no flicker).
+  const [client, setClient] = useState<ExperimentClient | null>(() =>
+    createExperimentClient(initialVariants),
+  );
+  const [ready, setReady] = useState(hasSSRVariants);
 
   useEffect(() => {
     let cancelled = false;
 
-    fetchExperimentVariants()
+    // Prefer SSR bootstrapped variants. Only remote-fetch on the client when
+    // the server could not provide any (missing key, timeout, etc.).
+    if (hasSSRVariants) {
+      const resolved = createExperimentClient(initialVariants);
+      if (!cancelled) {
+        setClient(resolved);
+        setReady(true);
+      }
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    fetchExperimentVariants(initialVariants)
       .then(resolvedClient => {
         if (cancelled) {
           return;
         }
-        setClient(resolvedClient ?? getExperimentClient());
+        setClient(resolvedClient ?? createExperimentClient(initialVariants));
         setReady(true);
       })
       .catch(error => {
         // eslint-disable-next-line no-console
         console.error('[Amplitude Experiment] Failed to fetch variants', error);
         if (!cancelled) {
-          setClient(getExperimentClient());
+          setClient(createExperimentClient(initialVariants));
           setReady(true);
         }
       });
@@ -52,16 +78,23 @@ export function ExperimentProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
+    // Mount-only: pageProps.experimentVariants are fixed for the document lifetime.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const variant = useCallback(
     (flagKey: string, fallback?: string | Variant) => {
+      // Prefer the SSR map so render matches server HTML even before client init.
+      const fromSSR = initialVariants[flagKey];
+      if (fromSSR && (fromSSR.value != null || fromSSR.key != null)) {
+        return fromSSR;
+      }
       if (!client) {
-        return getVariant(flagKey, fallback);
+        return getVariant(flagKey, fallback, initialVariants);
       }
       return client.variant(flagKey, fallback);
     },
-    [client],
+    [client, initialVariants],
   );
 
   const exposure = useCallback(
@@ -89,7 +122,7 @@ export function useExperiment(): ExperimentContextValue {
 }
 
 /**
- * Returns the variant for a flag key. Tracks exposure when the client is ready
+ * Returns the variant for a flag key. Tracks exposure on the client when ready
  * unless `track` is set to false.
  */
 export function useVariant(
@@ -102,7 +135,8 @@ export function useVariant(
   const resolved = variant(flagKey, fallback);
 
   useEffect(() => {
-    if (ready && track) {
+    // Client-only exposure tracking (SSR must not fire exposures).
+    if (ready && track && flagKey && flagKey !== 'off') {
       exposure(flagKey);
     }
   }, [ready, track, exposure, flagKey]);

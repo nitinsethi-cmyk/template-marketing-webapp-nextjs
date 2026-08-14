@@ -28,7 +28,7 @@ export function resolveContentfulVariation(
     return fallback;
   }
 
-  const variantKey = amplitudeVariant?.value || 'control';
+  const variantKey = amplitudeVariant?.value || amplitudeVariant?.key || 'control';
   const meta =
     container.meta && typeof container.meta === 'object'
       ? (container.meta as Record<string, string>)

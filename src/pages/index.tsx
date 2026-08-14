@@ -12,10 +12,11 @@ const LangPage: NextPage = () => {
   return <CtfPageGgl slug="/" />;
 };
 
-export const getServerSideProps = async ({ locale, query }: NextPageContext) => {
-  const preview = Boolean(query.preview);
+export const getServerSideProps = async ({ locale, query, req, res }: NextPageContext) => {
+  const preview = Boolean(query?.preview);
 
   try {
+    const { getServerExperimentVariants } = await import('@src/lib/experiment/server');
     const queryClient = new QueryClient();
 
     // Default queries
@@ -42,17 +43,21 @@ export const getServerSideProps = async ({ locale, query }: NextPageContext) => 
     const content = page?.pageContent;
     const extraSection = page?.extraSectionCollection?.items;
 
-    await Promise.all([
-      ...prefetchPromises,
-      ...prefetchPromiseArr({ inputArr: topSection, locale, queryClient }),
-      ...prefetchPromiseArr({ inputArr: extraSection, locale, queryClient }),
-      ...prefetchPromiseArr({ inputArr: [content], locale, queryClient }),
+    const [, experimentVariants] = await Promise.all([
+      Promise.all([
+        ...prefetchPromises,
+        ...prefetchPromiseArr({ inputArr: topSection, locale, queryClient }),
+        ...prefetchPromiseArr({ inputArr: extraSection, locale, queryClient }),
+        ...prefetchPromiseArr({ inputArr: [content], locale, queryClient }),
+      ]),
+      req && res ? getServerExperimentVariants(req, res) : Promise.resolve({}),
     ]);
 
     return {
       props: {
         ...(await getServerSideTranslations(locale)),
         dehydratedState: dehydrate(queryClient),
+        experimentVariants,
       },
     };
   } catch (error) {

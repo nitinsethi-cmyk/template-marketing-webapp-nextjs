@@ -140,8 +140,9 @@ export const CtfHeroBanner = (props: HeroBannerFieldsFragment) => {
   const hpWelcome = useVariant('hp-welcome', 'control');
   const isControlHeadline =
     !!headline && normalizeHeadline(headline) === normalizeHeadline(HP_WELCOME_CONTROL_HEADLINE);
+  const hpWelcomeKey = hpWelcome.value || hpWelcome.key;
   const displayHeadline =
-    hpWelcome.value === 'treatment' && isControlHeadline ? HP_WELCOME_TREATMENT_HEADLINE : headline;
+    hpWelcomeKey === 'treatment' && isControlHeadline ? HP_WELCOME_TREATMENT_HEADLINE : headline;
 
   return (
     <Container

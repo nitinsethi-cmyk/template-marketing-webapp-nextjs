@@ -1,5 +1,6 @@
 export {
   clearExperimentClient,
+  createExperimentClient,
   fetchExperimentVariants,
   getExperimentClient,
   getVariant,

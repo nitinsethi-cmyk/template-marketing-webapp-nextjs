@@ -1,3 +1,4 @@
+import { Variant } from '@amplitude/experiment-js-client';
 import { ContentfulLivePreviewProvider } from '@contentful/live-preview/react';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import { DehydratedState, Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -30,7 +31,11 @@ const LivePreviewProvider = ({ children }) => {
   );
 };
 
-type CustomPageProps = SSRConfig & { dehydratedState: DehydratedState; err: Error };
+type CustomPageProps = SSRConfig & {
+  dehydratedState: DehydratedState;
+  err: Error;
+  experimentVariants?: Record<string, Variant>;
+};
 
 const CustomApp = ({
   Component,
@@ -38,7 +43,7 @@ const CustomApp = ({
   pageProps: originalPageProps,
 }: AppProps<CustomPageProps>) => {
   const [queryClient] = useState(() => new QueryClient(queryConfig));
-  const { dehydratedState, err, ...pageProps } = originalPageProps;
+  const { dehydratedState, err, experimentVariants, ...pageProps } = originalPageProps;
   const { previewActive } = useContentfulContext();
 
   useEffect(() => {
@@ -85,7 +90,7 @@ const CustomApp = ({
             <StyledEngineProvider injectFirst>
               <ThemeProvider theme={colorfulTheme}>
                 <Hydrate state={dehydratedState}>
-                  <ExperimentProvider>
+                  <ExperimentProvider initialVariants={experimentVariants}>
                     <Layout preview={previewActive}>
                       <Component {...pageProps} err={err} />
                       <Settings />

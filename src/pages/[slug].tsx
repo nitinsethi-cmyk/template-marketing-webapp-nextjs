@@ -25,11 +25,18 @@ export interface CustomNextPageContext extends NextPageContext {
   id: string;
 }
 
-export const getServerSideProps = async ({ locale, params, query }: CustomNextPageContext) => {
+export const getServerSideProps = async ({
+  locale,
+  params,
+  query,
+  req,
+  res,
+}: CustomNextPageContext) => {
   const slug = params.slug;
   const preview = Boolean(query.preview);
 
   try {
+    const { getServerExperimentVariants } = await import('@src/lib/experiment/server');
     const queryClient = new QueryClient();
 
     // Default queries
@@ -54,17 +61,24 @@ export const getServerSideProps = async ({ locale, params, query }: CustomNextPa
     const topSection = page?.topSectionCollection?.items;
     const extraSection = page?.extraSectionCollection?.items;
     const content: ComponentReferenceFieldsFragment | undefined | null = page?.pageContent;
-    const experimentVariants = [
+    const contentfulExperimentEntries = [
       ...(page?.blackCardCtaText?.variantsCollection?.items ?? []),
       ...(page?.testSlot2?.variantsCollection?.items ?? []),
     ];
 
-    await Promise.all([
-      ...prefetchPromises,
-      ...prefetchPromiseArr({ inputArr: topSection, locale, queryClient }),
-      ...prefetchPromiseArr({ inputArr: extraSection, locale, queryClient }),
-      ...prefetchPromiseArr({ inputArr: [content], locale, queryClient }),
-      ...prefetchPromiseArr({ inputArr: experimentVariants, locale, queryClient }),
+    const [, experimentVariants] = await Promise.all([
+      Promise.all([
+        ...prefetchPromises,
+        ...prefetchPromiseArr({ inputArr: topSection, locale, queryClient }),
+        ...prefetchPromiseArr({ inputArr: extraSection, locale, queryClient }),
+        ...prefetchPromiseArr({ inputArr: [content], locale, queryClient }),
+        ...prefetchPromiseArr({
+          inputArr: contentfulExperimentEntries,
+          locale,
+          queryClient,
+        }),
+      ]),
+      req && res ? getServerExperimentVariants(req, res) : Promise.resolve({}),
     ]);
 
     if (content) {
@@ -75,14 +89,14 @@ export const getServerSideProps = async ({ locale, params, query }: CustomNextPa
           notFound: true,
         };
 
-      const query = prefetchMap?.[__typename];
+      const pageQuery = prefetchMap?.[__typename];
 
-      if (!query)
+      if (!pageQuery)
         return {
           notFound: true,
         };
 
-      const data: PrefetchMappingTypeFetcher = await query.fetcher({
+      const data: PrefetchMappingTypeFetcher = await pageQuery.fetcher({
         id: sys.id,
         locale,
         preview,
@@ -118,6 +132,7 @@ export const getServerSideProps = async ({ locale, params, query }: CustomNextPa
       props: {
         ...(await getServerSideTranslations(locale)),
         dehydratedState: dehydrate(queryClient),
+        experimentVariants,
       },
     };
   } catch (error) {
