@@ -5,11 +5,27 @@ import { ComponentResolver } from '@src/components/shared/component-resolver';
 import { PageContainer } from '@src/components/templates/page-container';
 import LayoutContext, { defaultLayout } from '@src/layout-context';
 import { resolveContentfulVariation, useVariant } from '@src/lib/experiment';
+import type { ContentfulEntryRef } from '@src/lib/experiment/resolveContentfulVariation';
 
 type SectionEntry = {
   __typename?: string | null;
   sys: { id: string };
 } | null;
+
+type PageVariation = ContentfulEntryRef & {
+  __typename: 'Page';
+  topSectionCollection?: { items?: Array<SectionEntry> | null } | null;
+  extraSectionCollection?: { items?: Array<SectionEntry> | null } | null;
+  pageContent?: SectionEntry;
+};
+
+function isPageVariation(entry: ContentfulEntryRef | null): entry is PageVariation {
+  return entry?.__typename === 'Page';
+}
+
+function filterSections(items: Array<SectionEntry> | null | undefined) {
+  return items?.filter((it): it is NonNullable<SectionEntry> => !!it) ?? null;
+}
 
 function withReplacedCta(
   items: SectionEntry[] | null | undefined,
@@ -35,10 +51,30 @@ function withReplacedCta(
 }
 
 const CtfPage = (props: CtfPageFieldsFragment) => {
-  const topSection =
-    props.topSectionCollection && props.topSectionCollection.items.filter(it => !!it);
-  const extraSection =
-    props.extraSectionCollection && props.extraSectionCollection.items.filter(it => !!it);
+  const defaultTopSection = filterSections(props.topSectionCollection?.items);
+  const defaultExtraSection = filterSections(props.extraSectionCollection?.items);
+
+  // Experiment: contentful-page-test (pageExperiment) → replaces the whole page when
+  // the mapped variant is a Page, otherwise replaces pageContent.
+  const pageExpContainer = props.pageExperiment;
+  const pageExpId = pageExpContainer?.experimentId ?? '';
+  const pageExpVariant = useVariant(pageExpId || 'off', 'control', {
+    track: Boolean(pageExpId),
+  });
+  const pageExpMatch = useMemo(
+    () => resolveContentfulVariation(pageExpContainer ?? null, pageExpVariant, null),
+    [pageExpContainer, pageExpVariant],
+  );
+
+  const baseTopSection = isPageVariation(pageExpMatch)
+    ? filterSections(pageExpMatch.topSectionCollection?.items)
+    : defaultTopSection;
+  const baseExtraSection = isPageVariation(pageExpMatch)
+    ? filterSections(pageExpMatch.extraSectionCollection?.items)
+    : defaultExtraSection;
+  const basePageContent = isPageVariation(pageExpMatch)
+    ? pageExpMatch.pageContent ?? null
+    : pageExpMatch ?? props.pageContent ?? null;
 
   // Experiment 1: finance-hp (blackCardCtaText) → replaces pageContent
   const primaryContainer = props.blackCardCtaText;
@@ -51,9 +87,9 @@ const CtfPage = (props: CtfPageFieldsFragment) => {
       resolveContentfulVariation(
         primaryContainer ?? null,
         primaryVariant,
-        props.pageContent ?? null,
+        basePageContent,
       ),
-    [primaryVariant, primaryContainer, props.pageContent],
+    [primaryVariant, primaryContainer, basePageContent],
   );
 
   // Experiment 2: finance-existing-customer (testSlot2) → replaces existing ComponentCta
@@ -64,8 +100,10 @@ const CtfPage = (props: CtfPageFieldsFragment) => {
   });
 
   const defaultCta =
-    (topSection?.find(item => item?.__typename === 'ComponentCta') as SectionEntry | undefined) ??
-    (extraSection?.find(item => item?.__typename === 'ComponentCta') as SectionEntry | undefined) ??
+    (baseTopSection?.find(item => item?.__typename === 'ComponentCta') as SectionEntry | undefined) ??
+    (baseExtraSection?.find(item => item?.__typename === 'ComponentCta') as
+      | SectionEntry
+      | undefined) ??
     null;
 
   const resolvedCta = useMemo(
@@ -73,25 +111,29 @@ const CtfPage = (props: CtfPageFieldsFragment) => {
       resolveContentfulVariation(
         slot2Container ?? null,
         slot2Variant,
-        defaultCta ? { __typename: defaultCta.__typename, sys: { id: defaultCta.sys.id } } : null,
+        defaultCta,
       ),
     [defaultCta, slot2Container, slot2Variant],
   );
 
   const resolvedTopSection = useMemo(
     () =>
-      withReplacedCta(topSection as SectionEntry[] | null, resolvedCta, Boolean(slot2ExperimentId)),
-    [topSection, resolvedCta, slot2ExperimentId],
+      withReplacedCta(
+        baseTopSection as SectionEntry[] | null,
+        resolvedCta,
+        Boolean(slot2ExperimentId),
+      ),
+    [baseTopSection, resolvedCta, slot2ExperimentId],
   );
 
   const resolvedExtraSection = useMemo(
     () =>
       withReplacedCta(
-        extraSection as SectionEntry[] | null,
+        baseExtraSection as SectionEntry[] | null,
         resolvedCta,
         Boolean(slot2ExperimentId),
       ),
-    [extraSection, resolvedCta, slot2ExperimentId],
+    [baseExtraSection, resolvedCta, slot2ExperimentId],
   );
 
   const layoutConfig = {

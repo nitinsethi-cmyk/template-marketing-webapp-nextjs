@@ -61,9 +61,22 @@ export const getServerSideProps = async ({
     const topSection = page?.topSectionCollection?.items;
     const extraSection = page?.extraSectionCollection?.items;
     const content: ComponentReferenceFieldsFragment | undefined | null = page?.pageContent;
+    const pageExperimentItems = page?.pageExperiment?.variantsCollection?.items ?? [];
+    const nestedPageExperimentEntries = pageExperimentItems.flatMap(item => {
+      if (!item || item.__typename !== 'Page') {
+        return [];
+      }
+      return [
+        ...(item.topSectionCollection?.items ?? []),
+        item.pageContent,
+        ...(item.extraSectionCollection?.items ?? []),
+      ];
+    });
     const contentfulExperimentEntries = [
       ...(page?.blackCardCtaText?.variantsCollection?.items ?? []),
       ...(page?.testSlot2?.variantsCollection?.items ?? []),
+      ...pageExperimentItems,
+      ...nestedPageExperimentEntries,
     ];
 
     const [, experimentVariants] = await Promise.all([
@@ -81,20 +94,39 @@ export const getServerSideProps = async ({
       req && res ? getServerExperimentVariants(req, res) : Promise.resolve({}),
     ]);
 
-    if (content) {
-      const { __typename, sys } = content;
+    const pageBodies = [
+      content,
+      ...pageExperimentItems
+        .map(item => (item && item.__typename === 'Page' ? item.pageContent : null))
+        .filter(Boolean),
+    ];
 
-      if (!__typename)
-        return {
-          notFound: true,
-        };
+    for (const body of pageBodies) {
+      if (!body) {
+        continue;
+      }
+
+      const { __typename, sys } = body;
+
+      if (!__typename) {
+        if (body === content) {
+          return {
+            notFound: true,
+          };
+        }
+        continue;
+      }
 
       const pageQuery = prefetchMap?.[__typename];
 
-      if (!pageQuery)
-        return {
-          notFound: true,
-        };
+      if (!pageQuery) {
+        if (body === content) {
+          return {
+            notFound: true,
+          };
+        }
+        continue;
+      }
 
       const data: PrefetchMappingTypeFetcher = await pageQuery.fetcher({
         id: sys.id,

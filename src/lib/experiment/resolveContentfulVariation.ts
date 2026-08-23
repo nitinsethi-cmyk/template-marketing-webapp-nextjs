@@ -5,11 +5,11 @@ export type ContentfulEntryRef = {
   sys: { id: string };
 };
 
-type VariantContainerLike = {
+type VariantContainerLike<T extends ContentfulEntryRef = ContentfulEntryRef> = {
   experimentId?: string | null;
   meta?: unknown;
   variantsCollection?: {
-    items?: Array<ContentfulEntryRef | null>;
+    items?: Array<T | null>;
   } | null;
 } | null;
 
@@ -19,11 +19,11 @@ type VariantContainerLike = {
  *
  * @see https://amplitude.com/docs/feature-experiment/contentful
  */
-export function resolveContentfulVariation(
-  container: VariantContainerLike,
+export function resolveContentfulVariation<T extends ContentfulEntryRef = ContentfulEntryRef>(
+  container: VariantContainerLike<T>,
   amplitudeVariant: Variant | undefined,
-  fallback: ContentfulEntryRef | null = null,
-): ContentfulEntryRef | null {
+  fallback: T | null = null,
+): T | null {
   if (!container?.experimentId) {
     return fallback;
   }

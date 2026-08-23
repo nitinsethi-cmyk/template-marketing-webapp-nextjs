@@ -69,7 +69,25 @@ export type VariantContainerFieldsFragment = { __typename: 'VariantContainer', e
       | { __typename: 'FooterMenu', sys: { __typename?: 'Sys', id: string } }
       | { __typename: 'MenuGroup', sys: { __typename?: 'Sys', id: string } }
       | { __typename: 'NavigationMenu', sys: { __typename?: 'Sys', id: string } }
-      | { __typename: 'Page', sys: { __typename?: 'Sys', id: string } }
+      | { __typename: 'Page', slug?: string | null, pageName?: string | null, sys: { __typename?: 'Sys', id: string }, topSectionCollection?: { __typename?: 'PageTopSectionCollection', items: Array<
+            | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+           | null> } | null, pageContent?:
+          | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+          | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+          | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+         | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
+            | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+           | null> } | null }
       | { __typename: 'Seo', sys: { __typename?: 'Sys', id: string } }
       | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
       | { __typename: 'TopicPerson', sys: { __typename?: 'Sys', id: string } }
@@ -123,6 +141,9 @@ export type CtfPageFieldsFragment = { __typename: 'Page', pageName?: string | nu
     { __typename?: 'VariantContainer' }
     & VariantContainerFieldsFragment
   ) | null, testSlot2?: (
+    { __typename?: 'VariantContainer' }
+    & VariantContainerFieldsFragment
+  ) | null, pageExperiment?: (
     { __typename?: 'VariantContainer' }
     & VariantContainerFieldsFragment
   ) | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
@@ -192,6 +213,38 @@ export const VariantContainerFieldsFragmentDoc = `
           id
         }
       }
+      ... on Page {
+        slug
+        pageName
+        topSectionCollection(limit: 20) {
+          items {
+            ... on Entry {
+              __typename
+              sys {
+                id
+              }
+            }
+          }
+        }
+        pageContent {
+          ... on Entry {
+            __typename
+            sys {
+              id
+            }
+          }
+        }
+        extraSectionCollection(limit: 20) {
+          items {
+            ... on Entry {
+              __typename
+              sys {
+                id
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -243,6 +296,9 @@ export const CtfPageFieldsFragmentDoc = `
     ...VariantContainerFields
   }
   testSlot2 {
+    ...VariantContainerFields
+  }
+  pageExperiment {
     ...VariantContainerFields
   }
   extraSectionCollection(limit: 20) {

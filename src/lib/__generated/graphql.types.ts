@@ -412,6 +412,7 @@ export type ComponentCta = Entry & _Node & {
   subline?: Maybe<ComponentCtaSubline>;
   sys: Sys;
   targetPage?: Maybe<ComponentCtaTargetPage>;
+  testCta?: Maybe<VariantContainer>;
   urlParameters?: Maybe<Scalars['String']['output']>;
 };
 
@@ -462,6 +463,15 @@ export type ComponentCtaTargetPageArgs = {
   locale?: InputMaybe<Scalars['String']['input']>;
   preview?: InputMaybe<Scalars['Boolean']['input']>;
   useFallbackLocale?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** [See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/componentCta) */
+export type ComponentCtaTestCtaArgs = {
+  locale?: InputMaybe<Scalars['String']['input']>;
+  preview?: InputMaybe<Scalars['Boolean']['input']>;
+  useFallbackLocale?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<VariantContainerFilter>;
 };
 
 
@@ -523,6 +533,8 @@ export type ComponentCtaFilter = {
   subline_not_contains?: InputMaybe<Scalars['String']['input']>;
   sys?: InputMaybe<SysFilter>;
   targetPage_exists?: InputMaybe<Scalars['Boolean']['input']>;
+  testCta?: InputMaybe<CfVariantContainerNestedFilter>;
+  testCta_exists?: InputMaybe<Scalars['Boolean']['input']>;
   urlParameters?: InputMaybe<Scalars['String']['input']>;
   urlParameters_contains?: InputMaybe<Scalars['String']['input']>;
   urlParameters_exists?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3024,6 +3036,7 @@ export type MenuGroupFeaturedPagesFilter = {
   internalName_not_contains?: InputMaybe<Scalars['String']['input']>;
   internalName_not_in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pageContent_exists?: InputMaybe<Scalars['Boolean']['input']>;
+  pageExperiment_exists?: InputMaybe<Scalars['Boolean']['input']>;
   pageName?: InputMaybe<Scalars['String']['input']>;
   pageName_contains?: InputMaybe<Scalars['String']['input']>;
   pageName_exists?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3089,6 +3102,7 @@ export type MenuGroupGroupLinkFilter = {
   internalName_not_contains?: InputMaybe<Scalars['String']['input']>;
   internalName_not_in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pageContent_exists?: InputMaybe<Scalars['Boolean']['input']>;
+  pageExperiment_exists?: InputMaybe<Scalars['Boolean']['input']>;
   pageName?: InputMaybe<Scalars['String']['input']>;
   pageName_contains?: InputMaybe<Scalars['String']['input']>;
   pageName_exists?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3439,6 +3453,7 @@ export type Page = Entry & _Node & {
   internalName?: Maybe<Scalars['String']['output']>;
   linkedFrom?: Maybe<PageLinkingCollections>;
   pageContent?: Maybe<PagePageContent>;
+  pageExperiment?: Maybe<VariantContainer>;
   pageName?: Maybe<Scalars['String']['output']>;
   seo?: Maybe<Seo>;
   slug?: Maybe<Scalars['String']['output']>;
@@ -3499,6 +3514,15 @@ export type PagePageContentArgs = {
   locale?: InputMaybe<Scalars['String']['input']>;
   preview?: InputMaybe<Scalars['Boolean']['input']>;
   useFallbackLocale?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** [See type definition](https://app.contentful.com/spaces/ei7qkoms0pgw/content_types/page) */
+export type PagePageExperimentArgs = {
+  locale?: InputMaybe<Scalars['String']['input']>;
+  preview?: InputMaybe<Scalars['Boolean']['input']>;
+  useFallbackLocale?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<VariantContainerFilter>;
 };
 
 
@@ -3625,6 +3649,8 @@ export type PageFilter = {
   internalName_not_contains?: InputMaybe<Scalars['String']['input']>;
   internalName_not_in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pageContent_exists?: InputMaybe<Scalars['Boolean']['input']>;
+  pageExperiment?: InputMaybe<CfVariantContainerNestedFilter>;
+  pageExperiment_exists?: InputMaybe<Scalars['Boolean']['input']>;
   pageName?: InputMaybe<Scalars['String']['input']>;
   pageName_contains?: InputMaybe<Scalars['String']['input']>;
   pageName_exists?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6169,12 +6195,35 @@ export type VariantContainerFilter = {
 
 export type VariantContainerLinkingCollections = {
   __typename?: 'VariantContainerLinkingCollections';
+  componentCtaCollection?: Maybe<ComponentCtaCollection>;
+  componentCtaCursorCollection?: Maybe<ComponentCtaCursorCollection>;
   componentInfoBlockCollection?: Maybe<ComponentInfoBlockCollection>;
   componentInfoBlockCursorCollection?: Maybe<ComponentInfoBlockCursorCollection>;
   entryCollection?: Maybe<EntryCollection>;
   entryCursorCollection?: Maybe<EntryCursorCollection>;
   pageCollection?: Maybe<PageCollection>;
   pageCursorCollection?: Maybe<PageCursorCollection>;
+};
+
+
+export type VariantContainerLinkingCollectionsComponentCtaCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  locale?: InputMaybe<Scalars['String']['input']>;
+  order?: InputMaybe<Array<InputMaybe<VariantContainerLinkingCollectionsComponentCtaCollectionOrder>>>;
+  preview?: InputMaybe<Scalars['Boolean']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  useFallbackLocale?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type VariantContainerLinkingCollectionsComponentCtaCursorCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  locale?: InputMaybe<Scalars['String']['input']>;
+  order?: InputMaybe<Array<InputMaybe<VariantContainerLinkingCollectionsComponentCtaCursorCollectionOrder>>>;
+  pageNext?: InputMaybe<Scalars['String']['input']>;
+  pagePrev?: InputMaybe<Scalars['String']['input']>;
+  preview?: InputMaybe<Scalars['Boolean']['input']>;
+  useFallbackLocale?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -6237,6 +6286,48 @@ export type VariantContainerLinkingCollectionsPageCursorCollectionArgs = {
   preview?: InputMaybe<Scalars['Boolean']['input']>;
   useFallbackLocale?: InputMaybe<Scalars['Boolean']['input']>;
 };
+
+export enum VariantContainerLinkingCollectionsComponentCtaCollectionOrder {
+  ColorPaletteAsc = 'colorPalette_ASC',
+  ColorPaletteDesc = 'colorPalette_DESC',
+  CtaTextAsc = 'ctaText_ASC',
+  CtaTextDesc = 'ctaText_DESC',
+  HeadlineAsc = 'headline_ASC',
+  HeadlineDesc = 'headline_DESC',
+  InternalNameAsc = 'internalName_ASC',
+  InternalNameDesc = 'internalName_DESC',
+  SysFirstPublishedAtAsc = 'sys_firstPublishedAt_ASC',
+  SysFirstPublishedAtDesc = 'sys_firstPublishedAt_DESC',
+  SysIdAsc = 'sys_id_ASC',
+  SysIdDesc = 'sys_id_DESC',
+  SysPublishedAtAsc = 'sys_publishedAt_ASC',
+  SysPublishedAtDesc = 'sys_publishedAt_DESC',
+  SysPublishedVersionAsc = 'sys_publishedVersion_ASC',
+  SysPublishedVersionDesc = 'sys_publishedVersion_DESC',
+  UrlParametersAsc = 'urlParameters_ASC',
+  UrlParametersDesc = 'urlParameters_DESC'
+}
+
+export enum VariantContainerLinkingCollectionsComponentCtaCursorCollectionOrder {
+  ColorPaletteAsc = 'colorPalette_ASC',
+  ColorPaletteDesc = 'colorPalette_DESC',
+  CtaTextAsc = 'ctaText_ASC',
+  CtaTextDesc = 'ctaText_DESC',
+  HeadlineAsc = 'headline_ASC',
+  HeadlineDesc = 'headline_DESC',
+  InternalNameAsc = 'internalName_ASC',
+  InternalNameDesc = 'internalName_DESC',
+  SysFirstPublishedAtAsc = 'sys_firstPublishedAt_ASC',
+  SysFirstPublishedAtDesc = 'sys_firstPublishedAt_DESC',
+  SysIdAsc = 'sys_id_ASC',
+  SysIdDesc = 'sys_id_DESC',
+  SysPublishedAtAsc = 'sys_publishedAt_ASC',
+  SysPublishedAtDesc = 'sys_publishedAt_DESC',
+  SysPublishedVersionAsc = 'sys_publishedVersion_ASC',
+  SysPublishedVersionDesc = 'sys_publishedVersion_DESC',
+  UrlParametersAsc = 'urlParameters_ASC',
+  UrlParametersDesc = 'urlParameters_DESC'
+}
 
 export enum VariantContainerLinkingCollectionsComponentInfoBlockCollectionOrder {
   ColorPaletteAsc = 'colorPalette_ASC',
@@ -6514,6 +6605,7 @@ export type CffeaturedPagesMultiTypeNestedFilter = {
   internalName_not_contains?: InputMaybe<Scalars['String']['input']>;
   internalName_not_in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pageContent_exists?: InputMaybe<Scalars['Boolean']['input']>;
+  pageExperiment_exists?: InputMaybe<Scalars['Boolean']['input']>;
   pageName?: InputMaybe<Scalars['String']['input']>;
   pageName_contains?: InputMaybe<Scalars['String']['input']>;
   pageName_exists?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6548,6 +6640,7 @@ export type CfgroupLinkMultiTypeNestedFilter = {
   internalName_not_contains?: InputMaybe<Scalars['String']['input']>;
   internalName_not_in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pageContent_exists?: InputMaybe<Scalars['Boolean']['input']>;
+  pageExperiment_exists?: InputMaybe<Scalars['Boolean']['input']>;
   pageName?: InputMaybe<Scalars['String']['input']>;
   pageName_contains?: InputMaybe<Scalars['String']['input']>;
   pageName_exists?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6823,7 +6916,25 @@ export type VariantContainerFieldsFragment = { __typename: 'VariantContainer', e
       | { __typename: 'FooterMenu', sys: { __typename?: 'Sys', id: string } }
       | { __typename: 'MenuGroup', sys: { __typename?: 'Sys', id: string } }
       | { __typename: 'NavigationMenu', sys: { __typename?: 'Sys', id: string } }
-      | { __typename: 'Page', sys: { __typename?: 'Sys', id: string } }
+      | { __typename: 'Page', slug?: string | null, pageName?: string | null, sys: { __typename?: 'Sys', id: string }, topSectionCollection?: { __typename?: 'PageTopSectionCollection', items: Array<
+            | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+           | null> } | null, pageContent?:
+          | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+          | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+          | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+         | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
+            | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+           | null> } | null }
       | { __typename: 'Seo', sys: { __typename?: 'Sys', id: string } }
       | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
       | { __typename: 'TopicPerson', sys: { __typename?: 'Sys', id: string } }
@@ -6854,7 +6965,25 @@ export type CtfPageFieldsFragment = { __typename: 'Page', pageName?: string | nu
         | { __typename: 'FooterMenu', sys: { __typename?: 'Sys', id: string } }
         | { __typename: 'MenuGroup', sys: { __typename?: 'Sys', id: string } }
         | { __typename: 'NavigationMenu', sys: { __typename?: 'Sys', id: string } }
-        | { __typename: 'Page', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'Page', slug?: string | null, pageName?: string | null, sys: { __typename?: 'Sys', id: string }, topSectionCollection?: { __typename?: 'PageTopSectionCollection', items: Array<
+              | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+             | null> } | null, pageContent?:
+            | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+           | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
+              | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+             | null> } | null }
         | { __typename: 'Seo', sys: { __typename?: 'Sys', id: string } }
         | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
         | { __typename: 'TopicPerson', sys: { __typename?: 'Sys', id: string } }
@@ -6872,7 +7001,61 @@ export type CtfPageFieldsFragment = { __typename: 'Page', pageName?: string | nu
         | { __typename: 'FooterMenu', sys: { __typename?: 'Sys', id: string } }
         | { __typename: 'MenuGroup', sys: { __typename?: 'Sys', id: string } }
         | { __typename: 'NavigationMenu', sys: { __typename?: 'Sys', id: string } }
-        | { __typename: 'Page', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'Page', slug?: string | null, pageName?: string | null, sys: { __typename?: 'Sys', id: string }, topSectionCollection?: { __typename?: 'PageTopSectionCollection', items: Array<
+              | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+             | null> } | null, pageContent?:
+            | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+           | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
+              | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+             | null> } | null }
+        | { __typename: 'Seo', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'TopicPerson', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'TopicProductFeature', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'VariantContainer', sys: { __typename?: 'Sys', id: string } }
+       | null> } | null } | null, pageExperiment?: { __typename: 'VariantContainer', experimentId?: string | null, meta?: any | null, experiment?: any | null, sys: { __typename?: 'Sys', id: string }, variantsCollection?: { __typename?: 'VariantContainerVariantsCollection', items: Array<
+        | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'FooterMenu', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'MenuGroup', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'NavigationMenu', sys: { __typename?: 'Sys', id: string } }
+        | { __typename: 'Page', slug?: string | null, pageName?: string | null, sys: { __typename?: 'Sys', id: string }, topSectionCollection?: { __typename?: 'PageTopSectionCollection', items: Array<
+              | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+             | null> } | null, pageContent?:
+            | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+           | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
+              | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+              | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+             | null> } | null }
         | { __typename: 'Seo', sys: { __typename?: 'Sys', id: string } }
         | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
         | { __typename: 'TopicPerson', sys: { __typename?: 'Sys', id: string } }
@@ -6917,7 +7100,25 @@ export type CtfPageQuery = { __typename?: 'Query', pageCollection?: { __typename
             | { __typename: 'FooterMenu', sys: { __typename?: 'Sys', id: string } }
             | { __typename: 'MenuGroup', sys: { __typename?: 'Sys', id: string } }
             | { __typename: 'NavigationMenu', sys: { __typename?: 'Sys', id: string } }
-            | { __typename: 'Page', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'Page', slug?: string | null, pageName?: string | null, sys: { __typename?: 'Sys', id: string }, topSectionCollection?: { __typename?: 'PageTopSectionCollection', items: Array<
+                  | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+                 | null> } | null, pageContent?:
+                | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+                | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+                | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+               | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
+                  | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+                 | null> } | null }
             | { __typename: 'Seo', sys: { __typename?: 'Sys', id: string } }
             | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
             | { __typename: 'TopicPerson', sys: { __typename?: 'Sys', id: string } }
@@ -6935,7 +7136,61 @@ export type CtfPageQuery = { __typename?: 'Query', pageCollection?: { __typename
             | { __typename: 'FooterMenu', sys: { __typename?: 'Sys', id: string } }
             | { __typename: 'MenuGroup', sys: { __typename?: 'Sys', id: string } }
             | { __typename: 'NavigationMenu', sys: { __typename?: 'Sys', id: string } }
-            | { __typename: 'Page', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'Page', slug?: string | null, pageName?: string | null, sys: { __typename?: 'Sys', id: string }, topSectionCollection?: { __typename?: 'PageTopSectionCollection', items: Array<
+                  | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+                 | null> } | null, pageContent?:
+                | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+                | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+                | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+               | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
+                  | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+                 | null> } | null }
+            | { __typename: 'Seo', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicPerson', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'TopicProductFeature', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'VariantContainer', sys: { __typename?: 'Sys', id: string } }
+           | null> } | null } | null, pageExperiment?: { __typename: 'VariantContainer', experimentId?: string | null, meta?: any | null, experiment?: any | null, sys: { __typename?: 'Sys', id: string }, variantsCollection?: { __typename?: 'VariantContainerVariantsCollection', items: Array<
+            | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'FooterMenu', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'MenuGroup', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'NavigationMenu', sys: { __typename?: 'Sys', id: string } }
+            | { __typename: 'Page', slug?: string | null, pageName?: string | null, sys: { __typename?: 'Sys', id: string }, topSectionCollection?: { __typename?: 'PageTopSectionCollection', items: Array<
+                  | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+                 | null> } | null, pageContent?:
+                | { __typename: 'ComponentProductTable', sys: { __typename?: 'Sys', id: string } }
+                | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
+                | { __typename: 'TopicProduct', sys: { __typename?: 'Sys', id: string } }
+               | null, extraSectionCollection?: { __typename?: 'PageExtraSectionCollection', items: Array<
+                  | { __typename: 'ComponentCta', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentDuplex', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentHeroBanner', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentInfoBlock', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentQuote', sys: { __typename?: 'Sys', id: string } }
+                  | { __typename: 'ComponentTextBlock', sys: { __typename?: 'Sys', id: string } }
+                 | null> } | null }
             | { __typename: 'Seo', sys: { __typename?: 'Sys', id: string } }
             | { __typename: 'TopicBusinessInfo', sys: { __typename?: 'Sys', id: string } }
             | { __typename: 'TopicPerson', sys: { __typename?: 'Sys', id: string } }

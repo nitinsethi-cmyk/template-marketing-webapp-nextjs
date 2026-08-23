@@ -28,6 +28,39 @@ fragment VariantContainerFields on VariantContainer {
           id
         }
       }
+      # Full-page experiments link a Page as the treatment entry
+      ... on Page {
+        slug
+        pageName
+        topSectionCollection(limit: 20) {
+          items {
+            ... on Entry {
+              __typename
+              sys {
+                id
+              }
+            }
+          }
+        }
+        pageContent {
+          ... on Entry {
+            __typename
+            sys {
+              id
+            }
+          }
+        }
+        extraSectionCollection(limit: 20) {
+          items {
+            ... on Entry {
+              __typename
+              sys {
+                id
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -75,6 +108,10 @@ fragment CtfPageFields on Page {
   }
   # Second independent experiment slot (finance-existing-customer)
   testSlot2 {
+    ...VariantContainerFields
+  }
+  # Full-page experiment slot (contentful-page-test on /classic-card)
+  pageExperiment {
     ...VariantContainerFields
   }
   extraSectionCollection(limit: 20) {

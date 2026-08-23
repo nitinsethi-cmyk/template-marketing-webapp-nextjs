@@ -170,6 +170,7 @@ type ComponentCta implements Entry & _Node {
   subline(locale: String, useFallbackLocale: Boolean): ComponentCtaSubline
   sys: Sys!
   targetPage(locale: String, preview: Boolean, useFallbackLocale: Boolean): ComponentCtaTargetPage
+  testCta(locale: String, preview: Boolean, useFallbackLocale: Boolean, where: VariantContainerFilter): VariantContainer
   urlParameters(locale: String, useFallbackLocale: Boolean): String
 }
 
@@ -223,6 +224,8 @@ input ComponentCtaFilter {
   subline_not_contains: String
   sys: SysFilter
   targetPage_exists: Boolean
+  testCta: cfVariantContainerNestedFilter
+  testCta_exists: Boolean
   urlParameters: String
   urlParameters_contains: String
   urlParameters_exists: Boolean
@@ -1889,6 +1892,7 @@ input MenuGroupFeaturedPagesFilter {
   internalName_not_contains: String
   internalName_not_in: [String]
   pageContent_exists: Boolean
+  pageExperiment_exists: Boolean
   pageName: String
   pageName_contains: String
   pageName_exists: Boolean
@@ -1954,6 +1958,7 @@ input MenuGroupGroupLinkFilter {
   internalName_not_contains: String
   internalName_not_in: [String]
   pageContent_exists: Boolean
+  pageExperiment_exists: Boolean
   pageName: String
   pageName_contains: String
   pageName_exists: Boolean
@@ -2182,6 +2187,7 @@ type Page implements Entry & _Node {
   internalName(locale: String, useFallbackLocale: Boolean): String
   linkedFrom(allowedLocales: [String]): PageLinkingCollections
   pageContent(locale: String, preview: Boolean, useFallbackLocale: Boolean): PagePageContent
+  pageExperiment(locale: String, preview: Boolean, useFallbackLocale: Boolean, where: VariantContainerFilter): VariantContainer
   pageName(locale: String, useFallbackLocale: Boolean): String
   seo(locale: String, preview: Boolean, useFallbackLocale: Boolean, where: SeoFilter): Seo
   slug(locale: String, useFallbackLocale: Boolean): String
@@ -2256,6 +2262,8 @@ input PageFilter {
   internalName_not_contains: String
   internalName_not_in: [String]
   pageContent_exists: Boolean
+  pageExperiment: cfVariantContainerNestedFilter
+  pageExperiment_exists: Boolean
   pageName: String
   pageName_contains: String
   pageName_exists: Boolean
@@ -3550,12 +3558,56 @@ input VariantContainerFilter {
 }
 
 type VariantContainerLinkingCollections {
+  componentCtaCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsComponentCtaCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentCtaCollection
+  componentCtaCursorCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsComponentCtaCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentCtaCursorCollection
   componentInfoBlockCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsComponentInfoBlockCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): ComponentInfoBlockCollection
   componentInfoBlockCursorCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsComponentInfoBlockCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): ComponentInfoBlockCursorCollection
   entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
   entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
   pageCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsPageCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): PageCollection
   pageCursorCollection(limit: Int = 100, locale: String, order: [VariantContainerLinkingCollectionsPageCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): PageCursorCollection
+}
+
+enum VariantContainerLinkingCollectionsComponentCtaCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  ctaText_ASC
+  ctaText_DESC
+  headline_ASC
+  headline_DESC
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+  urlParameters_ASC
+  urlParameters_DESC
+}
+
+enum VariantContainerLinkingCollectionsComponentCtaCursorCollectionOrder {
+  colorPalette_ASC
+  colorPalette_DESC
+  ctaText_ASC
+  ctaText_DESC
+  headline_ASC
+  headline_DESC
+  internalName_ASC
+  internalName_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+  urlParameters_ASC
+  urlParameters_DESC
 }
 
 enum VariantContainerLinkingCollectionsComponentInfoBlockCollectionOrder {
@@ -3832,6 +3884,7 @@ input cffeaturedPagesMultiTypeNestedFilter {
   internalName_not_contains: String
   internalName_not_in: [String]
   pageContent_exists: Boolean
+  pageExperiment_exists: Boolean
   pageName: String
   pageName_contains: String
   pageName_exists: Boolean
@@ -3866,6 +3919,7 @@ input cfgroupLinkMultiTypeNestedFilter {
   internalName_not_contains: String
   internalName_not_in: [String]
   pageContent_exists: Boolean
+  pageExperiment_exists: Boolean
   pageName: String
   pageName_contains: String
   pageName_exists: Boolean

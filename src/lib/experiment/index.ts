@@ -8,3 +8,4 @@ export {
 export { ExperimentProvider, useExperiment, useVariant } from './ExperimentProvider';
 export type { ExperimentContextValue } from './ExperimentProvider';
 export { resolveContentfulVariation } from './resolveContentfulVariation';
+export type { ContentfulEntryRef } from './resolveContentfulVariation';
